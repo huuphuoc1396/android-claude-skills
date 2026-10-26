@@ -1,0 +1,125 @@
+---
+name: brainstorming
+description: Clarify a feature idea or requirement before any planning or coding, then write task.md, the source of truth for the requirement. Accepts chat text, markdown/PRD files, images or designs, and ticket links. Asks multiple-choice questions in rounds until goal, scope, behavior, edge cases, and constraints are clear, confirms a summary, then writes docs/features/<feature>/task.md. Also updates an existing task.md when the requirement changes. Use at the start of a new feature, when a request is vague, or when asked to change a requirement.
+---
+
+# Brainstorming
+
+Goal: turn an idea into a `task.md` that a reviewer agrees with and that later steps (breakdown,
+implement-plan) can work from without asking again what the feature is supposed to do.
+
+`task.md` describes **what** and **why**, never **how**. No module, class, or library names unless the
+requirement itself demands them (e.g. "must work offline", "must use the existing login").
+
+This skill only writes docs: do not run build, test, lint, or format commands, even if CLAUDE.md lists
+checks to run before finishing.
+
+## Process
+
+### 1. Collect the input
+
+Accept any mix of:
+- Chat text.
+- File paths (markdown, PRD, notes): read them fully.
+- Images, screenshots, designs: describe what you see (screens, states, copy, actions) and confirm it.
+- Ticket or wiki links: read through an available connector. If none is available, ask the user to paste the content.
+
+If `docs/features/<feature>/task.md` already exists for this feature, go to **Updating task.md** below.
+
+### 2. Light context read
+
+Read only enough of the project to ask good questions: CLAUDE.md, the screens or features the idea touches,
+and related existing behavior. The point is to spot conflicts and reuse ("there is already a bookmark
+feature — should this extend it?"), not to design the solution.
+
+### 3. Ask in rounds
+
+Ask 2–4 multiple-choice questions per round, with a recommended option first and a short reason. Always
+allow a free-text answer. Go through these topics in order, skipping what the input already answers:
+
+1. **Goal** — the user problem, who it is for, how success is judged.
+2. **Scope** — what is in, what is explicitly out, which screens/entry points.
+3. **Behavior** — main flow step by step, UI states (empty, loading, content, error), user actions and their results.
+4. **Edge cases** — no network, empty data, permission denied, interruption (background, rotation, process
+   death), very long or missing content, repeated actions, concurrency.
+5. **Constraints** — platforms/API levels, offline, performance, accessibility, localization, analytics,
+   privacy, existing behavior that must not change.
+
+Rules:
+- Never assume an answer silently. If you choose a default, state it and let the user override it.
+- Each round builds on the last; don't re-ask what's settled.
+- Stop when every topic is either answered or explicitly deferred. Usually 2–4 rounds.
+
+### 4. Confirm the summary
+
+Before writing, post a short summary in chat: goal, in/out of scope, main flow, the acceptance criteria as
+one-liners, and open questions. Ask the user to confirm or correct it. Iterate until confirmed.
+
+### 5. Write task.md
+
+Pick a short kebab-case feature slug (confirm it with the user if not obvious) and write
+`docs/features/<feature>/task.md`:
+
+```markdown
+# <Feature name>
+
+Status: Draft | Confirmed
+Source: <chat / file path / ticket link>
+
+## Goal
+<Problem, target user, and the outcome in 2–4 sentences.>
+
+## Scope
+### In scope
+- ...
+### Out of scope
+- ...
+
+## User flow
+1. ...
+
+## UI states
+| State | When | What the user sees / can do |
+
+## Acceptance criteria
+- **AC-1** <short title>
+  - Given ...
+  - When ...
+  - Then ...
+
+## Edge cases
+- **EC-1** <situation> -> <expected behavior>
+
+## Constraints
+- ...
+
+## Open questions
+- [ ] ... (owner, needed before which step)
+
+## Change log
+- <YYYY-MM-DD>: Initial version.
+```
+
+Rules for the content:
+- Every acceptance criterion is observable and testable by a user or a test; no "should work well".
+- IDs (`AC-n`, `EC-n`) are stable: never renumber; mark removed ones `~~AC-3~~ (removed: reason)`.
+- Edge cases state the expected behavior, not just the situation.
+- Keep it to what was agreed. Don't invent requirements the user didn't confirm.
+
+Show the user the path and ask them to review. Set `Status: Confirmed` only when they approve.
+
+### 6. Finish
+
+Suggest the next step without running it:
+- Large task (several screens, several layers, or more than one reviewable diff): `breakdown`.
+- Small task: `implement-plan` directly on task.md.
+
+## Updating task.md
+
+When the user asks to change the requirement (in chat or with new material):
+1. Read the current task.md.
+2. Ask questions only about what the change leaves unclear, in the same round style.
+3. Show the proposed changes as a short list (added / changed / removed, with IDs) and wait for approval.
+4. Apply them, keep IDs stable, add a Change log line, and set `Status: Draft` until re-approved.
+5. If `subtasks/` or `implement-plans/` exist next to task.md, list the ones affected by the change and
+   suggest updating them. Do not edit them yourself.
