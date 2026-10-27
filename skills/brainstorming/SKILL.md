@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: Clarify a feature idea or requirement before any planning or coding, then write task.md, the source of truth for the requirement. Accepts chat text, markdown/PRD files, images or designs, and ticket links. Asks multiple-choice questions in rounds until goal, scope, behavior, edge cases, and constraints are clear, confirms a summary, then writes docs/features/<feature>/task.md. Also updates an existing task.md when the requirement changes. Use at the start of a new feature, when a request is vague, or when asked to change a requirement.
+description: Clarify a feature idea or requirement through rounds of questions and write docs/features/<feature>/task.md, the source of truth for the requirement. Use at the start of a new feature, when a feature request is vague, or when asked to change an existing requirement.
 ---
 
 # Brainstorming

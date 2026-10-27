@@ -1,6 +1,6 @@
 ---
 name: generate-rules
-description: Generate path-scoped rule files in .claude/rules/ for an Android project, one per architectural layer (for example ui, feature, domain, data, network, database, di, testing, build-logic), grouping all modules of a layer with path globs. Use after onboarding (CLAUDE.md exists) or when asked to generate, refresh, or add rules for layers or modules. Proposes a layer mapping first, then writes rules grounded in real reference files.
+description: Generate path-scoped rule files in .claude/rules/ for an Android project, one per architectural layer. Use after onboarding (CLAUDE.md exists), or when asked to generate, refresh, or add rules for layers or modules.
 ---
 
 # Generate rules

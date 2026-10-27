@@ -1,6 +1,6 @@
 ---
 name: onboard-codebase
-description: Explore an Android codebase and generate (or update) a concise CLAUDE.md covering setup, build/test commands, module map, architecture, conventions, reusable components, and things not to do. Use when starting on a new repo, or when asked to onboard, analyze the codebase, or create/refresh CLAUDE.md. Read-only until the user approves the draft.
+description: Explore an Android codebase and generate or update a concise CLAUDE.md (setup, commands, modules, architecture, conventions, reusable components, do-nots). Use when starting on a new repo, or when asked to onboard, analyze the codebase, or create/refresh CLAUDE.md.
 ---
 
 # Onboard codebase

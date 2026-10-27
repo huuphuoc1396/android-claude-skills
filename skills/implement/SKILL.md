@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Execute an approved implement plan in an Android project — write the production code and unit tests step by step, following CLAUDE.md and .claude/rules, compiling the touched modules after each step and running their unit tests once at the end (no UI, instrumented, or screenshot tests). Handles small deviations itself and stops to ask on design or requirement changes. Does not commit. Use when the user asks to implement a plan file.
+description: Execute an approved implement plan in an Android project: write production code and unit tests step by step, compiling as it goes. Does not commit. Use when asked to implement a plan file.
 ---
 
 # Implement
@@ -18,7 +18,8 @@ Do not re-ask anything answered in the linked task.md / subtask / plan.
    - If no plan exists, suggest `implement-plan` and stop.
 2. Read `CLAUDE.md` and the `.claude/rules/*.md` matching the modules in the plan's Changes overview.
 3. Check `git status`. If there are unrelated uncommitted changes, tell the user before touching anything.
-4. Set the plan `Status: In progress`.
+4. Set the plan `Status: In progress` and, if the plan came from a subtask, the subtask's
+   `Status: In progress`.
 
 ## For each step, in order
 
@@ -30,6 +31,9 @@ Do not re-ask anything answered in the linked task.md / subtask / plan.
 4. **Compile** the modules the step touched, main and unit test sources, without running tests (e.g.
    `./gradlew :<module>:compile<Variant>Kotlin :<module>:compile<Variant>UnitTestKotlin`; use the
    project's equivalent tasks if it differs). This catches errors before later steps build on them.
+   If the step changed the public API of a shared module (`core:*`, `common`, or any module others depend
+   on), also compile the modules that depend on it; find them by grepping build files for
+   `project(":<module>")` or the matching type-safe accessor.
 5. **Fix until it compiles.** Read the error and fix the cause; never suppress a compiler error without a
    reason. After 3 failed attempts on the same error, stop and report it with the output.
 6. **Tick the step** in the plan (`### Step 1: ... ✅`) and move on.
@@ -58,8 +62,9 @@ verified or re-recorded.
 
 ## Finish
 
-1. Run the **default tier** of CLAUDE.md's "Before finishing a code change" over every touched module
-   (build, unit tests, auto-format, baselines if dependencies changed). Run the full tier (format check,
+1. Run the **default tier** of CLAUDE.md's "Before finishing a code change" over every touched module,
+   plus the dependent modules of any shared module whose public API changed (build, unit tests,
+   auto-format, baselines if dependencies changed). Run the full tier (format check,
    lint, screenshot, instrumented) only if the user asks for it.
 2. **Fix failing tests.** Use the plan's Traceability table to find the step behind each failure, fix the
    cause in code (never delete or weaken a test to pass), and re-run only the failing modules. After 3
@@ -71,4 +76,5 @@ verified or re-recorded.
    - Steps done, files changed (grouped by module), deviations.
    - Commands run and their results, stated honestly (pass / fail with output).
    - What was not verified: UI / instrumented / screenshot tests, manual "How to test" steps.
-   - Do not commit. Ask whether to commit (Conventional Commits) once they have reviewed.
+   - Do not commit. Ask whether to commit once they have reviewed, using the commit style in CLAUDE.md
+     (or the style of recent `git log` if CLAUDE.md doesn't state one).

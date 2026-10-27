@@ -1,6 +1,6 @@
 ---
 name: breakdown
-description: Optional step for large tasks. Splits a task.md (or any requirement too big for one reviewable diff) into ordered subtasks under docs/features/<feature>/subtasks/, each a vertical slice that builds, can be reviewed in one sitting, and lets a tester run one flow. Subtask 1 delivers the happy path end to end; later subtasks add loading, refresh, errors, caching, and edge cases. Shows a short split outline in chat for the user to preview first, then asks how they want to group (merge) subtasks and asks when a subtask's scope is unclear, before writing any subtask file. Skip it when the task fits one implement plan.
+description: Split a large task.md into ordered, reviewable vertical-slice subtasks under docs/features/<feature>/subtasks/. Use when a feature spans several screens or layers or is too big for one reviewable diff; skip it when the task fits one implement plan.
 ---
 
 # Breakdown
@@ -85,7 +85,7 @@ Use when the task touches several screens or layers, or would produce more than 
 
 Feature: [task.md](../task.md)
 Depends on: <none | NN-...>
-Status: Todo
+Status: Todo | Planned | In progress | Done
 
 ## Goal
 <What works after this subtask, from the user's point of view, in 1–3 sentences.>
@@ -110,3 +110,6 @@ Status: Todo
 ```
 
 Keep AC/EC IDs identical to task.md so plans, code reviews, and tests can trace back to the requirement.
+
+New subtasks start as `Todo`. `implement-plan` sets `Planned` when their plan is approved; `implement`
+sets `In progress` when it starts and `Done` when it finishes.

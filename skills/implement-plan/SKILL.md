@@ -1,6 +1,6 @@
 ---
 name: implement-plan
-description: Write an implementation plan for a requirement in an Android project. Reads a task.md, a subtask file, or a requirement given in chat or a ticket, follows CLAUDE.md and .claude/rules, explores the codebase for conventions, patterns, and existing components to reuse (design system, network, database, data layer, module structure), asks the user to resolve technical and requirement questions, then writes an implement plan of ordered, buildable steps mapped to acceptance criteria. Writes no production code. Use before implementing any non-trivial change.
+description: Write an implementation plan of ordered, buildable steps mapped to acceptance criteria for an Android requirement (task.md, subtask, chat, or ticket). Writes no production code. Use before implementing any non-trivial change.
 ---
 
 # Implement plan
@@ -119,12 +119,15 @@ Rules for steps:
 - Every AC and EC appears in Traceability with at least one step and one test (or a manual check, stated).
 - Only the files the requirement needs. No speculative abstractions, base classes, or "for later" hooks.
 - Commands are the real ones from CLAUDE.md.
+- If a step changes the public API of a shared module, its Compile line also covers the modules that
+  depend on it, and Changes overview lists them as affected.
 
 ### 6. Review
 
 Self-check before showing it: every reused component exists at the stated path; the dependency direction
 follows CLAUDE.md; nothing in the plan duplicates an existing component. Then ask the user to review the
-file. Apply changes they ask for. Set `Status: Approved` only after an explicit yes.
+file. Apply changes they ask for. Set `Status: Approved` only after an explicit yes; if the input was a
+subtask, set its `Status: Planned` at the same time.
 
 ### 7. Finish
 
