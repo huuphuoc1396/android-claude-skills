@@ -1,3 +1,6 @@
 .DS_Store
 /settings.json
 /settings.local.json
+scenarios/.runs/
+scenarios/runner/.venv/
+__pycache__/

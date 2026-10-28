@@ -20,6 +20,29 @@ up, what to type, and what must be true afterwards.
    `scenarios/usage.py show [<number>]` lists every run and the average per scenario;
    `scenarios/usage.py record <number> --note "..."` fixes the number or adds a note to the newest session.
 
+## Running automatically
+
+`/run-scenarios` (in a Claude Code session at the repository root) or [`run.sh`](run.sh) runs scenarios
+with no one at the keyboard:
+
+```bash
+scenarios/run.sh all
+scenarios/run.sh 03 10 04
+scenarios/run.sh skill:slice --dry-run
+```
+
+For each scenario, [`runner/run.py`](runner/run.py) restores the Setup snapshot and starts three sessions
+with the Claude Agent SDK: the **subject** runs the skills in `sample-app/`; the **tester** plays the user
+from the scenario file, doing setup steps and answering every question dialog; the **judge** marks each
+checklist item pass / fail / unclear / skipped with evidence. A passing scenario saves its snapshot, a
+failing one skips the scenarios that build on it. Results go to `.runs/<run-id>/report.md` (plus a
+`log.md` and `judge.json` per scenario), one dated line in each scenario's **Findings**, and
+`usage.csv`.
+
+The run happens in a sandbox clone, `.runs/sandbox`, synced from this working tree, so its commits,
+branches, and `snap/*` tags stay there. Its sessions can't push, use the web, or write outside the
+sandbox. The first `run.sh` creates `runner/.venv` with `uv`.
+
 ## Baseline
 
 The `sample-baseline` git tag marks `sample-app/` with no `CLAUDE.md` or `.claude/rules/`. Its `docs/`
@@ -80,3 +103,4 @@ scenarios and the ones after them in the chain.
 | [15](15-triggers.md) | which skill a plain request loads | 02 |
 | [16](16-scout-rulebook-refresh.md) | scout and rulebook, refreshing their files | 02 |
 | [17](17-mold-figma-access.md) | mold, Figma access and token rules | 03 |
+| [18](18-mold-figma.md) | mold, from the real TMDB Figma file, then an update with no change | 02 |
