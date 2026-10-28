@@ -1,12 +1,14 @@
 # 02 - rulebook
 
-Setup: output of 01 (`CLAUDE.md` exists).
+Setup: `restore 01` (`CLAUDE.md` exists).
 
 Prompt:
 
 ```
 /rulebook
 ```
+
+Approve the layer table and the drafts. Accept the `.claude/rules/` pointer if offered.
 
 ## Expect
 

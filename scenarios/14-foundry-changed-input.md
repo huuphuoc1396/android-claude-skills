@@ -1,11 +1,12 @@
 # 14 - foundry: resume with a changed requirement
 
-Setup: output of 08 or 09 stopped partway, with at least one My List subtask `Done` and one not.
+Setup: `restore 06` (subtask 01 of My List `Done`, the others `Todo`; foundry resumes a feature whatever
+started it).
 
 Prompt, in a new session:
 
 ```
-/foundry <slug>: also show the release year under each poster on My List.
+/foundry <slug> Auto mode, don't commit: also show the release year under each poster on My List.
 ```
 
 ## Expect

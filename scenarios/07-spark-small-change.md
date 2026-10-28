@@ -1,6 +1,6 @@
 # 07 - small change skips slice
 
-Setup: output of 01.
+Setup: `restore 02`.
 
 Prompt:
 
@@ -9,6 +9,7 @@ Prompt:
 ```
 
 When asked whether this updates `title-discovery`, answer that it is a new feature.
+Confirm the summary, then run `/blueprint docs/features/<slug>/task.md` and approve the plan.
 
 ## Expect
 

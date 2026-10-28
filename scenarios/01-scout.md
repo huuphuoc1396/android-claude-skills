@@ -1,6 +1,6 @@
 # 01 - scout
 
-Setup: baseline.
+Setup: `restore baseline`.
 
 Prompt:
 
@@ -8,7 +8,7 @@ Prompt:
 /scout
 ```
 
-Answer questions: say Hilt + Room + Retrofit are the target stack, nothing is legacy.
+Answer questions: say Hilt + Room + Retrofit are the target stack, nothing is legacy. Approve the draft.
 
 ## Expect
 

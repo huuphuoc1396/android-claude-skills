@@ -1,13 +1,16 @@
 # 12 - slice: update subtasks after a requirement change
 
-Setup: output of 11, with task.md approved again (`Status: Confirmed`). Before running, plan subtask 02
-with `/blueprint` and approve it, so one subtask is `Planned`.
+Setup: `restore 11` (task.md approved again, `Status: Confirmed`). Plan subtask 02 with
+`/blueprint docs/features/<slug>/subtasks/02-<slug>.md`, approve it, and `save 12-setup`, so one
+subtask is `Planned`. Rerun from `restore 12-setup`.
 
 Prompt:
 
 ```
 /slice docs/features/<slug>/task.md
 ```
+
+Put the long-press removal criteria where slice recommends. Approve the changes.
 
 ## Expect
 

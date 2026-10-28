@@ -1,6 +1,6 @@
 # 03 - spark: My List
 
-Setup: output of 01.
+Setup: `restore 02`.
 
 Prompt:
 
@@ -9,8 +9,9 @@ Prompt:
 profile avatar on Home, newest first. The list must work offline.
 ```
 
-When asked whether this updates `title-discovery`, answer that it is a new feature. Answer at least one
-other question with a non-recommended option, to check it is respected.
+When asked whether this updates `title-discovery`, answer that it is a new feature. On the next question
+after that, pick the second option and note the question in Findings, to check a non-recommended answer
+is respected. Confirm the summary.
 
 ## Expect
 

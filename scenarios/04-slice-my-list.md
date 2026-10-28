@@ -1,6 +1,6 @@
 # 04 - slice: My List
 
-Setup: output of 03.
+Setup: `restore 10` (task.md from 03 and design.md from 10).
 
 Prompt:
 
@@ -9,6 +9,7 @@ Prompt:
 ```
 
 When asked about something not needed for a first release, choose to take it out of the feature.
+Answer `ok` to the outline and pick the recommended merges in the grouping question.
 
 ## Expect
 

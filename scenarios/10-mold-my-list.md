@@ -1,6 +1,6 @@
 # 10 - mold: My List
 
-Setup: output of 03 (Confirmed task.md). The design is [`fixtures/my-list.drawio`](fixtures/my-list.drawio),
+Setup: `restore 03` (Confirmed task.md). The design is [`fixtures/my-list.drawio`](fixtures/my-list.drawio),
 a wireframe with deliberate gaps:
 - `Sort list` has no flow leading to it.
 - `tap poster → Title details` points at no screen in this design (Title details already exists in the app).
@@ -15,6 +15,8 @@ Prompt:
 ```
 
 Answer the cross-check questions: Sort is out of scope; a poster opens the existing Title details.
+Approve design.md. Don't add long-press removal to task.md here: scenario 11 adds it through `spark`.
+Then `save 10`, before the Update part.
 
 ## Expect
 
@@ -50,7 +52,8 @@ and run:
 - [ ] Adds a Change log line and sets `Status: Draft`.
 - [ ] If subtasks or plans exist, lists them and points to `slice` and `blueprint`.
 
-Restore the fixture afterwards: `git restore scenarios/fixtures/my-list.drawio`.
+Afterwards, put both back so later scenarios use the My List design:
+`git restore scenarios/fixtures/my-list.drawio` and `restore 10`.
 
 ## Findings
 

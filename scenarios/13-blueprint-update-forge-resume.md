@@ -1,7 +1,9 @@
 # 13 - blueprint update and forge resume
 
-Setup: output of 12. Run `/forge` on subtask 02's plan and stop the session once Step 1 is ticked (`✅`),
-so the plan is `In progress` with some steps done.
+Setup: `restore 12`. In a session, run
+`/forge docs/features/<slug>/implement-plans/02-<slug>.md Do only Step 1 in this session, then stop.`
+Check that the plan is `In progress` with Step 1 ticked (`✅`) and Step 2 not; otherwise redo from
+`restore 12`. Then `save 13-setup`, and rerun from `restore 13-setup`.
 
 Prompt, in a new session:
 

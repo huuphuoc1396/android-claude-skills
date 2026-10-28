@@ -1,12 +1,15 @@
 # 05 - blueprint: My List subtask 01
 
-Setup: output of 02 and 04 (and 10 for the design checks).
+Setup: `restore 04` (includes the rules from 02 and design.md from 10).
 
 Prompt:
 
 ```
 /blueprint docs/features/<slug>/subtasks/01-<slug>.md
 ```
+
+On the schema change: add a column for the time a title was favorited, with an auto-migration; existing
+rows get 0 so they sort last. Approve the plan.
 
 ## Expect
 

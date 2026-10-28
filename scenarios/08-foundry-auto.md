@@ -1,6 +1,6 @@
 # 08 - foundry, Auto mode
 
-Setup: output of 01 and 02, no `docs/features/<slug>/` for My List. Start on `main`, to check that
+Setup: `restore 02` (no `docs/features/<slug>/` for My List yet). Start on `main`, to check that
 foundry doesn't commit there. Delete the branch it creates afterwards.
 
 Prompt:
@@ -10,6 +10,8 @@ Prompt:
 separate My List screen, opened from the profile avatar on Home, newest first. The list must work
 offline.
 ```
+
+When it stops on the schema change, answer as in 05. Approve the change to `FavoritesRepository`.
 
 ## Expect
 

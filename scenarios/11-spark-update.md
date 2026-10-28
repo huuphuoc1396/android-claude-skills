@@ -1,12 +1,14 @@
 # 11 - spark: change a requirement
 
-Setup: output of 06 (subtask 01 of My List `Done`, the other subtasks `Todo`).
+Setup: `restore 06` (subtask 01 of My List `Done`, the other subtasks `Todo`).
 
 Prompt:
 
 ```
 /spark <slug>: users can remove a title from My List with a long-press, with Undo in a snackbar.
 ```
+
+Answer that removing from My List also clears the heart on Title details. Approve the change.
 
 ## Expect
 

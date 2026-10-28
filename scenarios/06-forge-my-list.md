@@ -1,12 +1,14 @@
 # 06 - forge: My List subtask 01
 
-Setup: output of 05.
+Setup: `restore 05`.
 
 Prompt:
 
 ```
 /forge docs/features/<slug>/implement-plans/01-<slug>.md
 ```
+
+If warned about unrelated changes (none expected after a restore), continue. When asked to commit: no.
 
 ## Expect
 
