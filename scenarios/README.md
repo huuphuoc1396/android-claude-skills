@@ -13,8 +13,9 @@ up, what to type, and what must be true afterwards.
 
 ## Baseline
 
-The `sample-baseline` git tag marks `sample-app/` with no skill output (no `CLAUDE.md`, `.claude/rules/`,
-or `docs/`). Reset to it with:
+The `sample-baseline` git tag marks `sample-app/` with no `CLAUDE.md` or `.claude/rules/`. Its `docs/`
+holds one finished feature, `title-discovery` (Home, Title details, Onboarding, Search, favorites), so
+skills meet an existing feature as in a real project. Reset to it with:
 
 ```bash
 git restore --source=sample-baseline -- sample-app && git clean -fd -- sample-app
@@ -34,11 +35,15 @@ Scenarios build on each other's output: run them in number order, or reset and r
 | --- | --- | --- |
 | [01](01-scout.md) | scout | baseline |
 | [02](02-rulebook.md) | rulebook | 01 |
-| [03](03-spark-bookmarks.md) | spark | 01 |
-| [04](04-slice-bookmarks.md) | slice | 03 |
-| [05](05-blueprint-bookmarks.md) | blueprint | 02, 04 |
-| [06](06-forge-bookmarks.md) | forge | 05 |
+| [03](03-spark-my-list.md) | spark | 01 |
+| [04](04-slice-my-list.md) | slice | 03 |
+| [05](05-blueprint-my-list.md) | blueprint | 02, 04 (10 for the design checks) |
+| [06](06-forge-my-list.md) | forge | 05 |
 | [07](07-spark-small-change.md) | spark → blueprint (no slice) | 01 |
 | [08](08-foundry-auto.md) | foundry, Auto mode | 01, 02 |
 | [09](09-foundry-interactive.md) | foundry, Interactive mode | 01, 02 |
-| [10](10-mold-bookmarks.md) | mold, from a draw.io wireframe | 03 |
+| [10](10-mold-my-list.md) | mold, from a draw.io wireframe | 03 |
+| [11](11-spark-update.md) | spark, changing a requirement | 06 |
+| [12](12-slice-update.md) | slice, updating subtasks | 11 |
+| [13](13-blueprint-update-forge-resume.md) | blueprint update, forge resume | 12 |
+| [14](14-foundry-changed-input.md) | foundry, resume with changed input | 08 or 09, stopped partway |

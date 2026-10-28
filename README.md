@@ -23,6 +23,11 @@ spark → [mold] → [slice] → blueprint → forge    (per feature)
 foundry                                         (the same, in one go)
 ```
 
+When the requirement or design changes, run `spark` or `mold` again: they update their file and list
+the subtasks and plans affected, which `slice` and `blueprint` then update without touching finished
+work. `forge` resumes from the first unticked step, and `foundry` runs this whole update chain when it is
+called again with changed input.
+
 ## Repository layout
 
 ```
@@ -35,8 +40,16 @@ scenarios/     # step-by-step checks for each skill, run against sample-app
 ## Testing the skills
 
 Open Claude Code in `sample-app/` and follow [scenarios/README.md](scenarios/README.md). The sample app is
-a Spaceflight News reader (Compose, Hilt, Room, Retrofit, convention plugins in `build-logic/`) with one
-feature, `feature:news`, and unit tests:
+a movie and TV browser built on [TMDB](https://www.themoviedb.org/) (Compose, Hilt, Room, Retrofit,
+convention plugins in `build-logic/`) with four features, `feature:home`, `feature:details`,
+`feature:search`, and `feature:onboarding`, plus core modules and unit tests.
+
+Put a TMDB API key in the gitignored `sample-app/local.properties`. Without it the app still builds, but
+every TMDB request fails with 401:
+
+```properties
+TMDB_API_KEY=<your key>
+```
 
 ```bash
 cd sample-app && ./gradlew assembleDebug testDebugUnitTest

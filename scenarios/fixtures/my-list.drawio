@@ -1,0 +1,46 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="my-list" name="My List">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="home" value="&lt;b&gt;Home (excerpt)&lt;/b&gt;&lt;br&gt;&lt;br&gt;Heading: &quot;O que você quer assistir hoje?&quot;&lt;br&gt;Profile avatar, top right&lt;br&gt;&lt;br&gt;(search, tabs, and rows unchanged)" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="360" height="640" as="geometry" />
+        </mxCell>
+
+        <mxCell id="my-list" value="&lt;b&gt;My List&lt;/b&gt;&lt;br&gt;&lt;br&gt;Top bar: back arrow · &quot;Minha lista&quot;&lt;br&gt;&lt;br&gt;Poster grid, 3 columns&lt;br&gt;[poster] filled heart in the corner&lt;br&gt;[title name, 2 lines]&lt;br&gt;&lt;br&gt;Newest favorite first" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="560" y="80" width="360" height="640" as="geometry" />
+        </mxCell>
+
+        <mxCell id="my-list-empty" value="&lt;b&gt;My List / Empty&lt;/b&gt;&lt;br&gt;&lt;br&gt;Top bar: back arrow · &quot;Minha lista&quot;&lt;br&gt;&lt;br&gt;[illustration: empty list]&lt;br&gt;&quot;Sua lista está vazia&quot;&lt;br&gt;&quot;Toque no coração de um título para salvá-lo aqui.&quot;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="80" width="360" height="640" as="geometry" />
+        </mxCell>
+
+        <mxCell id="my-list-landscape" value="&lt;b&gt;My List / Landscape&lt;/b&gt;&lt;br&gt;&lt;br&gt;Same top bar&lt;br&gt;Poster grid, 5 columns" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="80" width="520" height="300" as="geometry" />
+        </mxCell>
+
+        <mxCell id="sort" value="&lt;b&gt;Sort list&lt;/b&gt;&lt;br&gt;&lt;br&gt;Bottom sheet: &quot;Ordenar por&quot;&lt;br&gt;Options: &quot;Mais recentes&quot; · &quot;Nome&quot;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="780" width="360" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="note-remove" value="Long-press a poster to remove it from the list.&lt;br&gt;Snackbar: &quot;Removido da Minha lista&quot; · action &quot;Desfazer&quot;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;size=14;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="560" y="760" width="300" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" value="tap profile avatar" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="home" target="my-list">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="no favorites" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;" edge="1" parent="1" source="my-list" target="my-list-empty">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="tap poster → Title details" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="my-list">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="740" y="20" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
