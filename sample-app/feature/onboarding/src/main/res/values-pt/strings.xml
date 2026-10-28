@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_onboarding_headline"><![CDATA[Tudo sobre <b>filmes</b>, <b>séries</b>, <b>animes</b> e <b>muito mais.</b>]]></string>
+    <string name="feature_onboarding_body">Fique por dentro das informações de filmes, séries, animes e muito mais.</string>
+    <string name="feature_onboarding_continue">Acessar</string>
+</resources>

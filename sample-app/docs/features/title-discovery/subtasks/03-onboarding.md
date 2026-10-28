@@ -3,7 +3,7 @@
 Feature: [task.md](../task.md)
 Depends on: 01-home-browse
 Design: [onboard](../screens/onboard.md) (Default)
-Status: Todo
+Status: Done
 
 ## Goal
 On first launch the user sees Onboarding and enters Home with "Acessar"; on every later launch the app

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_onboarding_headline"><![CDATA[All about <b>movies</b>, <b>series</b>, <b>anime</b> and <b>much more.</b>]]></string>
+    <string name="feature_onboarding_body">Stay up to date on movies, series, anime and much more.</string>
+    <string name="feature_onboarding_continue">Get started</string>
+    <string name="feature_onboarding_logo" translatable="false">The Movie DB</string>
+</resources>
