@@ -7,6 +7,7 @@ import com.example.sample.core.data.model.TitleDetails
 import com.example.sample.core.testing.MainDispatcherRule
 import com.example.sample.core.testing.repository.TestFavoritesRepository
 import com.example.sample.core.testing.repository.TestTitleRepository
+import com.example.sample.core.testing.util.TestNetworkMonitor
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -19,9 +20,10 @@ class DetailsViewModelTest {
 
     private val repository = TestTitleRepository()
     private val favorites = TestFavoritesRepository()
+    private val networkMonitor = TestNetworkMonitor()
     private val savedStateHandle = SavedStateHandle(mapOf("id" to 7L, "mediaType" to "Tv"))
 
-    private fun viewModel() = DetailsViewModel(savedStateHandle, repository, favorites)
+    private fun viewModel() = DetailsViewModel(savedStateHandle, repository, favorites, networkMonitor)
 
     @Test
     fun cachedDetails_shownWhileRefreshing() = runTest {
@@ -74,6 +76,23 @@ class DetailsViewModelTest {
             viewModel.retry()
 
             assertEquals(DetailsUiState.Success(details, isFavorite = false), expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun reconnect_afterOfflineError_loadsDetails() = runTest {
+        networkMonitor.setOnline(false)
+        repository.refreshError = IOException("offline")
+        val viewModel = viewModel()
+
+        viewModel.uiState.test {
+            assertEquals(DetailsUiState.Error(offline = true), expectMostRecentItem())
+            repository.refreshError = null
+            repository.sendTitleDetails(details)
+            networkMonitor.setOnline(true)
+
+            assertEquals(DetailsUiState.Success(details, isFavorite = false), expectMostRecentItem())
+            assertEquals(2, repository.detailsRefreshCount)
         }
     }
 

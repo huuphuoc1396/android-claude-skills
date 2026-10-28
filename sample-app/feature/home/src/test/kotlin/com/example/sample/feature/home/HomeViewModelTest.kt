@@ -8,6 +8,7 @@ import com.example.sample.core.data.model.MediaType
 import com.example.sample.core.data.model.Title
 import com.example.sample.core.testing.MainDispatcherRule
 import com.example.sample.core.testing.repository.TestTitleRepository
+import com.example.sample.core.testing.util.TestNetworkMonitor
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -19,9 +20,10 @@ class HomeViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val repository = TestTitleRepository()
+    private val networkMonitor = TestNetworkMonitor()
 
     private fun viewModel(savedStateHandle: SavedStateHandle = SavedStateHandle()) =
-        HomeViewModel(savedStateHandle, repository)
+        HomeViewModel(savedStateHandle, repository, networkMonitor)
 
     @Test
     fun initialState_isFilmsLoading() {
@@ -113,6 +115,23 @@ class HomeViewModelTest {
                 expectMostRecentItem(),
             )
             assertEquals(listOf(Category.Films, Category.Anime), repository.refreshedCategories)
+        }
+    }
+
+    @Test
+    fun reconnect_afterOffline_refreshesAndClearsNotice() = runTest {
+        networkMonitor.setOnline(false)
+        repository.refreshError = IOException("offline")
+        repository.sendCategoryTitles(Category.Films, CategoryTitles(featured = listOf(film), popular = emptyList()))
+        val viewModel = viewModel()
+
+        viewModel.uiState.test {
+            assertEquals(true, (expectMostRecentItem().content as HomeContent.Success).offlineNotice)
+            repository.refreshError = null
+            networkMonitor.setOnline(true)
+
+            assertEquals(HomeContent.Success(featured = listOf(film), popular = emptyList()), expectMostRecentItem().content)
+            assertEquals(2, repository.refreshedCategories.size)
         }
     }
 

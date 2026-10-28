@@ -30,7 +30,12 @@ fun SampleEmptyState(
     modifier: Modifier = Modifier,
 ) {
     CenteredColumn(modifier) {
-        Text(message, style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
@@ -42,7 +47,12 @@ fun SampleErrorState(
     retryLabel: String = "Retry",
 ) {
     CenteredColumn(modifier) {
-        Text(message, style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
+        )
         Button(onClick = onRetry) { Text(retryLabel) }
     }
 }

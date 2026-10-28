@@ -6,6 +6,8 @@ import com.example.sample.core.data.repository.DefaultUserPreferencesRepository
 import com.example.sample.core.data.repository.FavoritesRepository
 import com.example.sample.core.data.repository.TitleRepository
 import com.example.sample.core.data.repository.UserPreferencesRepository
+import com.example.sample.core.data.util.ConnectivityManagerNetworkMonitor
+import com.example.sample.core.data.util.NetworkMonitor
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -22,4 +24,7 @@ internal interface DataModule {
 
     @Binds
     fun bindsUserPreferencesRepository(impl: DefaultUserPreferencesRepository): UserPreferencesRepository
+
+    @Binds
+    fun bindsNetworkMonitor(impl: ConnectivityManagerNetworkMonitor): NetworkMonitor
 }

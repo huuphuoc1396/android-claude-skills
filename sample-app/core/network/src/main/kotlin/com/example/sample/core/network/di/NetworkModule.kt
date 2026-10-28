@@ -1,5 +1,6 @@
 package com.example.sample.core.network.di
 
+import com.example.sample.core.network.BuildConfig
 import com.example.sample.core.network.TmdbNetworkDataSource
 import com.example.sample.core.network.retrofit.RetrofitTmdbNetwork
 import com.example.sample.core.network.retrofit.TmdbApi
@@ -23,7 +24,13 @@ internal object NetworkModule {
     @Provides
     @Singleton
     fun providesOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC })
+        .addInterceptor(
+            HttpLoggingInterceptor().apply {
+                // Request lines only, and never in release builds; the API key must not reach logcat.
+                level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
+                redactQueryParams("api_key")
+            },
+        )
         .build()
 
     @Provides

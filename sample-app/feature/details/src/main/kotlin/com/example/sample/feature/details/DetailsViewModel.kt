@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.sample.core.data.model.MediaType
 import com.example.sample.core.data.repository.FavoritesRepository
 import com.example.sample.core.data.repository.TitleRepository
+import com.example.sample.core.data.util.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +23,7 @@ class DetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val titleRepository: TitleRepository,
     private val favoritesRepository: FavoritesRepository,
+    networkMonitor: NetworkMonitor,
 ) : ViewModel() {
 
     // Keys are the property names of DetailsDestination.
@@ -54,6 +56,12 @@ class DetailsViewModel @Inject constructor(
 
     init {
         refresh()
+        // EC-1, EC-2: retry when the connection returns instead of waiting for "Tentar novamente".
+        viewModelScope.launch {
+            networkMonitor.isOnline.collect { online ->
+                if (online && refreshState.value == RefreshState.Offline) refresh()
+            }
+        }
     }
 
     /** Saves [favorite] as the new state; the screen sends the opposite of what it shows. */

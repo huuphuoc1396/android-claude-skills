@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.sample.core.data.model.Category
 import com.example.sample.core.data.model.CategoryTitles
 import com.example.sample.core.data.repository.TitleRepository
+import com.example.sample.core.data.util.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,6 +26,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val titleRepository: TitleRepository,
+    networkMonitor: NetworkMonitor,
 ) : ViewModel() {
 
     /** The search text, kept while results are open and across process death. */
@@ -50,6 +52,12 @@ class HomeViewModel @Inject constructor(
 
     init {
         refresh()
+        // EC-1: the offline notice goes away once fresh content loads, so retry when the connection returns.
+        viewModelScope.launch {
+            networkMonitor.isOnline.collect { online ->
+                if (online && refreshState.value == RefreshState.Offline) refresh()
+            }
+        }
     }
 
     fun onQueryChange(query: String) {

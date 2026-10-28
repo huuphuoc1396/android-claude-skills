@@ -188,10 +188,12 @@ private fun BackButton(onBack: () -> Unit) {
     Row(
         modifier = Modifier
             .statusBarsPadding()
-            .padding(start = 18.dp, top = 12.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .padding(start = 14.dp, top = 8.dp)
+            .clip(RoundedCornerShape(16.dp))
+            // Keeps "Voltar" readable when the page scrolls under it; matches the favorite button.
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
             .clickable(onClick = onBack)
-            .padding(4.dp),
+            .padding(start = 6.dp, top = 4.dp, end = 12.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
