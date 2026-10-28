@@ -16,6 +16,8 @@ data class TitleDetails(
     val cast: List<CastMember>,
     val genres: List<String>,
     val recommendations: List<Title>,
+    /** A YouTube link, or null when TMDB lists no YouTube trailer. */
+    val trailerUrl: String?,
 )
 
 data class CastMember(

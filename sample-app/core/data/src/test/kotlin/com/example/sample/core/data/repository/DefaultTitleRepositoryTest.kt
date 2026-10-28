@@ -17,6 +17,8 @@ import com.example.sample.core.network.model.NetworkReleaseDate
 import com.example.sample.core.network.model.NetworkReleaseDates
 import com.example.sample.core.network.model.NetworkTitle
 import com.example.sample.core.network.model.NetworkTitleDetails
+import com.example.sample.core.network.model.NetworkVideo
+import com.example.sample.core.network.model.NetworkVideos
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -177,6 +179,7 @@ class DefaultTitleRepositoryTest {
                 cast = listOf(CastMember("Sandra Bullock", "https://image.tmdb.org/t/p/w185/sandra.jpg")),
                 genres = listOf("Drama", "Thriller"),
                 recommendations = listOf(Title(2, MediaType.Tv, "Lucifer", null)),
+                trailerUrl = null,
             ),
             details,
         )
@@ -269,6 +272,39 @@ class DefaultTitleRepositoryTest {
         val cast = repository.getTitleDetails(1, MediaType.Movie).cast
 
         assertEquals((1..10).map { "Actor $it" }, cast.map { it.name })
+    }
+
+    @Test
+    fun trailer_picksOfficialYouTubeTrailer() = testScope.runTest {
+        network.details = mapOf(
+            1L to NetworkTitleDetails(
+                id = 1,
+                videos = NetworkVideos(
+                    listOf(
+                        NetworkVideo(key = "teaser", site = "YouTube", type = "Teaser", official = true),
+                        NetworkVideo(key = "fan", site = "YouTube", type = "Trailer", official = false),
+                        NetworkVideo(key = "vimeo", site = "Vimeo", type = "Trailer", official = true),
+                        NetworkVideo(key = "official", site = "YouTube", type = "Trailer", official = true),
+                    ),
+                ),
+            ),
+        )
+
+        val trailerUrl = repository.getTitleDetails(1, MediaType.Movie).trailerUrl
+
+        assertEquals("https://www.youtube.com/watch?v=official", trailerUrl)
+    }
+
+    @Test
+    fun trailer_noYouTubeTrailer_isNull() = testScope.runTest {
+        network.details = mapOf(
+            1L to NetworkTitleDetails(
+                id = 1,
+                videos = NetworkVideos(listOf(NetworkVideo(key = "clip", site = "YouTube", type = "Clip"))),
+            ),
+        )
+
+        assertEquals(null, repository.getTitleDetails(1, MediaType.Movie).trailerUrl)
     }
 
     private fun releaseDates(country: String, vararg dates: NetworkReleaseDate) =

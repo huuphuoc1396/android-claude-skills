@@ -11,6 +11,7 @@ private const val POSTER_BASE_URL = "${IMAGE_BASE_URL}w342"
 private const val ARTWORK_BASE_URL = "${IMAGE_BASE_URL}w780"
 private const val PROFILE_BASE_URL = "${IMAGE_BASE_URL}w185"
 private const val THEATRICAL_RELEASE = 3
+private const val YOUTUBE_WATCH_URL = "https://www.youtube.com/watch?v="
 private const val MAX_CAST = 10
 private const val MAX_RECOMMENDATIONS = 20
 
@@ -44,6 +45,11 @@ internal fun NetworkTitleDetails.asExternalModel(mediaType: TmdbMediaType, regio
         recommendations = recommendations?.results.orEmpty()
             .take(MAX_RECOMMENDATIONS)
             .map { it.asExternalModel(it.mediaType?.toTmdbMediaType() ?: mediaType) },
+        trailerUrl = videos?.results.orEmpty()
+            .filter { it.site == "YouTube" && it.type == "Trailer" }
+            .sortedByDescending { it.official }
+            .firstOrNull()
+            ?.let { YOUTUBE_WATCH_URL + it.key },
     )
 }
 

@@ -8,5 +8,8 @@ sealed interface DetailsUiState {
     /** Loading the title failed. */
     data object Error : DetailsUiState
 
-    data class Success(val details: TitleDetails) : DetailsUiState
+    data class Success(
+        val details: TitleDetails,
+        val isFavorite: Boolean,
+    ) : DetailsUiState
 }

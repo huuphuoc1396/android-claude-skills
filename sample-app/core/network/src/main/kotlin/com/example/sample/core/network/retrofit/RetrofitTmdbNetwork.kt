@@ -28,6 +28,7 @@ interface TmdbApi {
         @Path("media") media: String,
         @Path("id") id: Long,
         @Query("append_to_response") append: String,
+        @Query("include_video_language") videoLanguages: String,
     ): NetworkTitleDetails
 }
 
@@ -48,8 +49,9 @@ internal class RetrofitTmdbNetwork @Inject constructor(
         media = mediaType.path,
         id = id,
         append = when (mediaType) {
-            TmdbMediaType.Movie -> "credits,recommendations,release_dates"
-            TmdbMediaType.Tv -> "credits,recommendations"
+            TmdbMediaType.Movie -> "credits,recommendations,release_dates,videos"
+            TmdbMediaType.Tv -> "credits,recommendations,videos"
         },
+        videoLanguages = tmdbVideoLanguages(Locale.getDefault()),
     )
 }

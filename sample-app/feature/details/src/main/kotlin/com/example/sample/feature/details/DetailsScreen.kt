@@ -1,5 +1,7 @@
 package com.example.sample.feature.details
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,9 +28,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +42,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +50,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -53,8 +61,10 @@ import com.example.sample.core.data.model.TitleDetails
 import com.example.sample.core.designsystem.component.SampleErrorState
 import com.example.sample.core.designsystem.component.SampleLoadingState
 import com.example.sample.core.designsystem.component.SamplePoster
+import com.example.sample.core.designsystem.component.SamplePrimaryButton
 import com.example.sample.core.designsystem.theme.SampleColors
 import com.example.sample.core.designsystem.theme.SampleTheme
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 private val SideMargin = 30.dp
@@ -81,6 +91,7 @@ internal fun DetailsRoute(
         onBack = onBack,
         onRetry = viewModel::retry,
         onTitleClick = onTitleClick,
+        onFavoriteChange = viewModel::setFavorite,
     )
 }
 
@@ -90,8 +101,20 @@ internal fun DetailsScreen(
     onBack: () -> Unit,
     onRetry: () -> Unit,
     onTitleClick: (Title) -> Unit,
+    onFavoriteChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val trailerError = stringResource(R.string.feature_details_trailer_error)
+    val openTrailer: (String) -> Unit = { url ->
+        try {
+            context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+        } catch (e: ActivityNotFoundException) {
+            scope.launch { snackbarHostState.showSnackbar(trailerError) }
+        }
+    }
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -104,9 +127,48 @@ internal fun DetailsScreen(
                 onRetry = onRetry,
                 retryLabel = stringResource(R.string.feature_details_retry),
             )
-            is DetailsUiState.Success -> DetailsContent(uiState.details, onTitleClick)
+            is DetailsUiState.Success -> DetailsContent(uiState.details, onTitleClick, openTrailer)
         }
         BackButton(onBack)
+        if (uiState is DetailsUiState.Success) {
+            FavoriteButton(
+                isFavorite = uiState.isFavorite,
+                onClick = { onFavoriteChange(!uiState.isFavorite) },
+                modifier = Modifier.align(Alignment.TopEnd),
+            )
+        }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding(),
+        )
+    }
+}
+
+@Composable
+private fun FavoriteButton(
+    isFavorite: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .statusBarsPadding()
+            .padding(top = 8.dp, end = SideMargin)
+            .size(32.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            painter = painterResource(if (isFavorite) R.drawable.ic_favorite_filled else R.drawable.ic_favorite),
+            contentDescription = stringResource(
+                if (isFavorite) R.string.feature_details_favorite_remove else R.string.feature_details_favorite_add,
+            ),
+            modifier = Modifier.size(18.dp),
+        )
     }
 }
 
@@ -140,6 +202,7 @@ private fun BackButton(onBack: () -> Unit) {
 private fun DetailsContent(
     details: TitleDetails,
     onTitleClick: (Title) -> Unit,
+    onTrailerClick: (String) -> Unit,
 ) {
     Box(Modifier.verticalScroll(rememberScrollState())) {
         Box(
@@ -179,8 +242,17 @@ private fun DetailsContent(
                     modifier = Modifier.padding(start = SideMargin, end = SideMargin, top = 21.dp),
                 )
             }
+            details.trailerUrl?.let { url ->
+                SamplePrimaryButton(
+                    label = stringResource(R.string.feature_details_trailer),
+                    onClick = { onTrailerClick(url) },
+                    icon = painterResource(R.drawable.ic_play),
+                    modifier = Modifier.padding(start = SideMargin, end = SideMargin, top = 30.dp),
+                )
+            }
             if (details.cast.isNotEmpty()) {
-                SectionHeading(stringResource(R.string.feature_details_cast), Modifier.padding(top = 30.dp))
+                val castTop = if (details.trailerUrl != null) 46.dp else 30.dp
+                SectionHeading(stringResource(R.string.feature_details_cast), Modifier.padding(top = castTop))
                 CastRow(details.cast)
             }
             if (details.genres.isNotEmpty()) {
@@ -364,11 +436,14 @@ private fun DetailsScreenPreview() {
                     cast = List(5) { CastMember("Sandra Bullock", null) },
                     genres = listOf("Drama", "Thriller"),
                     recommendations = List(3) { Title(it.toLong(), MediaType.Tv, "Lucifer", null) },
+                    trailerUrl = "https://www.youtube.com/watch?v=example",
                 ),
+                isFavorite = true,
             ),
             onBack = {},
             onRetry = {},
             onTitleClick = {},
+            onFavoriteChange = {},
         )
     }
 }

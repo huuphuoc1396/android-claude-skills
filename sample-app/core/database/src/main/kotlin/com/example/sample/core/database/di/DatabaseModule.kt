@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.sample.core.database.SampleDatabase
 import com.example.sample.core.database.dao.ArticleDao
+import com.example.sample.core.database.dao.FavoriteDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,4 +22,7 @@ internal object DatabaseModule {
 
     @Provides
     fun providesArticleDao(database: SampleDatabase): ArticleDao = database.articleDao()
+
+    @Provides
+    fun providesFavoriteDao(database: SampleDatabase): FavoriteDao = database.favoriteDao()
 }

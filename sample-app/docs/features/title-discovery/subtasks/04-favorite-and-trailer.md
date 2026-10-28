@@ -3,7 +3,7 @@
 Feature: [task.md](../task.md)
 Depends on: 02-title-details
 Design: [show](../screens/show.md) (Favorited, No trailer, Trailer can't open)
-Status: Todo
+Status: Done
 
 ## Goal
 On Title details the user can favorite or unfavorite a title, and it stays that way after a restart. When

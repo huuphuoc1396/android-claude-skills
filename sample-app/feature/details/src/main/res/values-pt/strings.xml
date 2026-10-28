@@ -6,4 +6,8 @@
     <string name="feature_details_recommendations">Recomendações</string>
     <string name="feature_details_error">Não foi possível carregar</string>
     <string name="feature_details_retry">Tentar novamente</string>
+    <string name="feature_details_trailer">Assistir trailer</string>
+    <string name="feature_details_trailer_error">Não foi possível abrir o trailer</string>
+    <string name="feature_details_favorite_add">Adicionar aos favoritos</string>
+    <string name="feature_details_favorite_remove">Remover dos favoritos</string>
 </resources>

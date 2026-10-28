@@ -20,6 +20,7 @@ data class NetworkTitleDetails(
     @SerializedName("credits") val credits: NetworkCredits? = null,
     @SerializedName("recommendations") val recommendations: NetworkPage? = null,
     @SerializedName("release_dates") val releaseDates: NetworkReleaseDates? = null,
+    @SerializedName("videos") val videos: NetworkVideos? = null,
 )
 
 data class NetworkGenre(
@@ -43,6 +44,18 @@ data class NetworkReleaseDates(
 data class NetworkCountryReleases(
     @SerializedName("iso_3166_1") val country: String,
     @SerializedName("release_dates") val releaseDates: List<NetworkReleaseDate>,
+)
+
+data class NetworkVideos(
+    @SerializedName("results") val results: List<NetworkVideo>,
+)
+
+/** A trailer, teaser, or clip; [key] is the id on [site], e.g. a YouTube video id. */
+data class NetworkVideo(
+    @SerializedName("key") val key: String,
+    @SerializedName("site") val site: String,
+    @SerializedName("type") val type: String,
+    @SerializedName("official") val official: Boolean = false,
 )
 
 /** [type] 3 is a theatrical release. */

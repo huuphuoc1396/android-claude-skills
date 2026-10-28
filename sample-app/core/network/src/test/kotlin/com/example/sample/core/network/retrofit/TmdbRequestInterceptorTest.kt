@@ -31,6 +31,11 @@ class TmdbRequestInterceptorTest {
     }
 
     @Test
+    fun tmdbVideoLanguages_portuguese_includesEnglish() {
+        assertEquals("pt,en,null", tmdbVideoLanguages(Locale.forLanguageTag("pt-BR")))
+    }
+
+    @Test
     fun tmdbRegion_other_isUs() {
         assertEquals("US", tmdbRegion(Locale.forLanguageTag("en-GB")))
     }
