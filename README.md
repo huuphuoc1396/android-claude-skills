@@ -22,6 +22,25 @@ spark → [slice] → blueprint → forge    (per feature)
 foundry                                (the same, in one go)
 ```
 
+## Repository layout
+
+```
+skills/        # the skills; the only place to edit them
+sample-app/    # small multi-module Android app for testing the skills
+  .claude/skills -> ../../skills   (symlink, so the app always sees the current skills)
+scenarios/     # step-by-step checks for each skill, run against sample-app
+```
+
+## Testing the skills
+
+Open Claude Code in `sample-app/` and follow [scenarios/README.md](scenarios/README.md). The sample app is
+a Spaceflight News reader (Compose, Hilt, Room, Retrofit, convention plugins in `build-logic/`) with one
+feature, `feature:news`, and unit tests:
+
+```bash
+cd sample-app && ./gradlew assembleDebug testDebugUnitTest
+```
+
 ## Install
 
 Copy the skills into your user or project skills directory:
