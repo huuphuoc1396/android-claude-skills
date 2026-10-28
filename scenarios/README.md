@@ -15,7 +15,7 @@ up, what to type, and what must be true afterwards.
 5. If it passed and later scenarios restore it, save it: `scenarios/snapshot.sh save <number>`.
 6. Usage is recorded for you: a Stop hook in `.claude/settings.json` runs
    `usage.py hook` after every turn and writes the session's tokens and API-equivalent cost
-   (subagents included) to `scenarios/usage.csv`, one session per run. The scenario number comes from
+   (subagents included) to `usage.csv`, one session per run. The scenario number comes from
    matching the first prompt against each scenario's `Prompt:` block; anything else is recorded as `-`.
    Under each reply the hook shows a line such as `Usage: this turn $0.12 · scenario 08 5.1M tokens, $2.65`.
    `usage.py show [<number>]` lists every run and the average per scenario;

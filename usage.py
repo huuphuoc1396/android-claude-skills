@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Measure the tokens and API-equivalent cost of each session at the repository root, and keep every run in
-scenarios/usage.csv.
+usage.csv at the repository root.
 
 Reads a session's Claude Code transcript (plus its subagent transcripts), sums usage per model, prices it,
-and writes one row per model to scenarios/usage.csv. Rows are keyed by session, so recording a session
+and writes one row per model to usage.csv. Rows are keyed by session, so recording a session
 again replaces its rows. The scenario number is found by matching the session's first prompt against the
 `Prompt:` block of each scenario file; a session that matches none is recorded with scenario `-`.
 
@@ -30,7 +30,7 @@ from collections import defaultdict
 
 ROOT = pathlib.Path(__file__).resolve().parent
 SCENARIOS = ROOT / "scenarios"
-CSV = SCENARIOS / "usage.csv"
+CSV = ROOT / "usage.csv"
 PROJECTS = pathlib.Path.home() / ".claude" / "projects"
 SESSIONS_DIR = PROJECTS / ("-" + str(ROOT).strip("/").replace("/", "-").replace(".", "-"))
 
