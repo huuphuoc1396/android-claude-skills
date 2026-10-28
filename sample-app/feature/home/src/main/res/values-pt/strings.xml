@@ -13,4 +13,5 @@
     <string name="feature_home_empty">Nada por aqui ainda</string>
     <string name="feature_home_offline">Você está offline</string>
     <string name="feature_home_cached_notice">Você está offline. O conteúdo pode estar desatualizado.</string>
+    <string name="feature_home_attribution">Este produto usa a API do TMDB, mas não é endossado nem certificado pelo TMDB.</string>
 </resources>

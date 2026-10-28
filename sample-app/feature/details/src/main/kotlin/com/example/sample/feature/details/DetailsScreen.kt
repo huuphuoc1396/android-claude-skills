@@ -47,7 +47,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -350,7 +353,13 @@ private fun MetaText(text: String, modifier: Modifier = Modifier) {
 private fun RatingRing(percent: Int, modifier: Modifier = Modifier) {
     val track = MaterialTheme.colorScheme.surface
     val arc = MaterialTheme.colorScheme.secondary
-    Box(modifier = modifier.size(57.dp), contentAlignment = Alignment.Center) {
+    val description = stringResource(R.string.feature_details_rating, percent)
+    Box(
+        modifier = modifier
+            .size(57.dp)
+            .clearAndSetSemantics { contentDescription = description },
+        contentAlignment = Alignment.Center,
+    ) {
         Canvas(Modifier.fillMaxSize()) {
             drawCircle(track)
             drawArc(arc, startAngle = -90f, sweepAngle = 360f * percent / 100f, useCenter = true)
@@ -408,6 +417,7 @@ private fun CastItem(member: CastMember) {
             color = Color.White,
             textAlign = TextAlign.Center,
             maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = 7.dp),
         )
     }

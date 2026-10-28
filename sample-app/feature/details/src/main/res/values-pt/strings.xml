@@ -13,4 +13,5 @@
     <string name="feature_details_offline">Você está offline</string>
     <string name="feature_details_cached_notice">Você está offline. O conteúdo pode estar desatualizado.</string>
     <string name="feature_details_refresh_failed">Não foi possível atualizar</string>
+    <string name="feature_details_rating">Avaliação %1$d%%</string>
 </resources>

@@ -132,6 +132,16 @@ class HomeViewModelTest {
         assertEquals("lucifer", viewModel.query.value)
     }
 
+    @Test
+    fun selectedCategory_restoredFromSavedState() = runTest {
+        val viewModel = viewModel(SavedStateHandle(mapOf("category" to Category.Novelas)))
+
+        viewModel.uiState.test {
+            assertEquals(Category.Novelas, expectMostRecentItem().selectedCategory)
+            assertEquals(listOf(Category.Novelas), repository.refreshedCategories)
+        }
+    }
+
     private val film = Title(id = 1, mediaType = MediaType.Movie, name = "Matrix", posterUrl = null)
     private val series = Title(id = 2, mediaType = MediaType.Tv, name = "Lucifer", posterUrl = null)
 }

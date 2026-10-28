@@ -3,7 +3,7 @@
 Feature: [task.md](../task.md)
 Depends on: 05-search, 06-offline-and-states
 Design: [home](../screens/home.md), [show](../screens/show.md), [search-results](../screens/search-results.md), [onboard](../screens/onboard.md)
-Status: Todo
+Status: Done
 
 ## Goal
 The app keeps the user's place through rotation and process death, works with a screen reader and large

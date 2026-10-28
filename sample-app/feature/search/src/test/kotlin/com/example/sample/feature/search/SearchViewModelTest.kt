@@ -83,6 +83,16 @@ class SearchViewModelTest {
         }
     }
 
+    @Test
+    fun editedQuery_isSavedInState() {
+        val savedStateHandle = SavedStateHandle(mapOf("query" to "matrix"))
+        val viewModel = SearchViewModel(savedStateHandle, repository)
+
+        viewModel.onQueryChange("lucifer")
+
+        assertEquals("lucifer", savedStateHandle.get<String>("query"))
+    }
+
     private val matrix = Title(id = 1, mediaType = MediaType.Movie, name = "Matrix", posterUrl = null)
     private val lucifer = Title(id = 2, mediaType = MediaType.Tv, name = "Lucifer", posterUrl = null)
 }

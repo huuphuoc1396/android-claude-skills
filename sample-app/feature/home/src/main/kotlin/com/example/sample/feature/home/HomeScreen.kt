@@ -40,6 +40,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -200,7 +203,8 @@ private fun CategoryTabs(
                 modifier = Modifier
                     .clip(RoundedCornerShape(70.dp))
                     .background(if (isSelected) MaterialTheme.colorScheme.secondary else Color.Transparent)
-                    .clickable { onSelected(category) }
+                    .clickable(role = Role.Tab) { onSelected(category) }
+                    .semantics { this.selected = isSelected }
                     .padding(horizontal = 14.dp, vertical = 6.dp),
             )
         }
@@ -249,6 +253,14 @@ private fun LazyListScope.content(
                     )
                 }
                 item { PosterRow(content.popular, onTitleClick, Modifier.padding(top = 16.dp)) }
+            }
+            item {
+                Text(
+                    text = stringResource(R.string.feature_home_attribution),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = SampleColors.TextTertiary,
+                    modifier = Modifier.padding(start = SideMargin, end = SideMargin, top = 32.dp),
+                )
             }
         }
     }

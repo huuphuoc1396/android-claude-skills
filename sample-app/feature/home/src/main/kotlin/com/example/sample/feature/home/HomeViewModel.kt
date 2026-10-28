@@ -30,7 +30,8 @@ class HomeViewModel @Inject constructor(
     /** The search text, kept while results are open and across process death. */
     val query: StateFlow<String> = savedStateHandle.getStateFlow(QUERY_KEY, "")
 
-    private val selectedCategory = MutableStateFlow(Category.Films)
+    /** The selected tab, kept across rotation and process death (EC-7). */
+    private val selectedCategory = savedStateHandle.getStateFlow(CATEGORY_KEY, Category.Films)
     private val refreshState = MutableStateFlow(RefreshState.Loading)
     private var refreshJob: Job? = null
 
@@ -44,7 +45,7 @@ class HomeViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = HomeUiState(Category.Films, HomeContent.Loading),
+            initialValue = HomeUiState(selectedCategory.value, HomeContent.Loading),
         )
 
     init {
@@ -56,7 +57,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun selectCategory(category: Category) {
-        selectedCategory.value = category
+        savedStateHandle[CATEGORY_KEY] = category
         refresh()
     }
 
@@ -97,5 +98,6 @@ class HomeViewModel @Inject constructor(
 
     private companion object {
         const val QUERY_KEY = "query"
+        const val CATEGORY_KEY = "category"
     }
 }

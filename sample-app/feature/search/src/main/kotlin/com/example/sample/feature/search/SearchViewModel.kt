@@ -21,12 +21,12 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val titleRepository: TitleRepository,
 ) : ViewModel() {
 
-    // The key is the property name of SearchDestination.
-    private val query = MutableStateFlow<String>(checkNotNull(savedStateHandle["query"]))
+    // The key is the property name of SearchDestination; edits overwrite it so they survive process death (EC-7).
+    private val query = savedStateHandle.getStateFlow(QUERY_KEY, "")
     private val submittedQuery = MutableStateFlow(query.value)
     private val retryCount = MutableStateFlow(0)
 
@@ -46,7 +46,7 @@ class SearchViewModel @Inject constructor(
         )
 
     fun onQueryChange(newQuery: String) {
-        query.value = newQuery
+        savedStateHandle[QUERY_KEY] = newQuery
     }
 
     /** Runs a new search for the typed text; blank text is ignored. */
@@ -68,5 +68,9 @@ class SearchViewModel @Inject constructor(
         SearchResults.Offline
     } catch (e: Exception) {
         SearchResults.Error
+    }
+
+    private companion object {
+        const val QUERY_KEY = "query"
     }
 }
