@@ -4,3 +4,4 @@
 scenarios/.runs/
 scenarios/runner/.venv/
 __pycache__/
+scenarios/usage.csv
