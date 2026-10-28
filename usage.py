@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""Measure the tokens and API-equivalent cost of each session in sample-app/, and keep every run in usage.csv.
+"""Measure the tokens and API-equivalent cost of each session at the repository root, and keep every run in
+scenarios/usage.csv.
 
 Reads a session's Claude Code transcript (plus its subagent transcripts), sums usage per model, prices it,
 and writes one row per model to scenarios/usage.csv. Rows are keyed by session, so recording a session
 again replaces its rows. The scenario number is found by matching the session's first prompt against the
 `Prompt:` block of each scenario file; a session that matches none is recorded with scenario `-`.
 
-  scenarios/usage.py hook
-      # Stop hook in sample-app/.claude/settings.local.json: reads the session from stdin after every turn
-  scenarios/usage.py record [<scenario>] [--session <id|path>] [--note "..."]
-      # by hand; default session: the newest one under sample-app/
-  scenarios/usage.py show [<scenario>]
+  usage.py hook
+      # Stop hook in .claude/settings.json: reads the session from stdin after every turn
+  usage.py record [<scenario>] [--session <id|path>] [--note "..."]
+      # by hand; default session: the newest one at the repository root
+  usage.py show [<scenario>]
       # every recorded run, then the average per scenario
 
 Prices are USD per million tokens (Anthropic API rates). On a Pro/Max subscription nothing is billed per
@@ -27,11 +28,11 @@ import subprocess
 import sys
 from collections import defaultdict
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+ROOT = pathlib.Path(__file__).resolve().parent
 SCENARIOS = ROOT / "scenarios"
 CSV = SCENARIOS / "usage.csv"
 PROJECTS = pathlib.Path.home() / ".claude" / "projects"
-SAMPLE_DIR = PROJECTS / ("-" + str(ROOT / "sample-app").strip("/").replace("/", "-").replace(".", "-"))
+SESSIONS_DIR = PROJECTS / ("-" + str(ROOT).strip("/").replace("/", "-").replace(".", "-"))
 
 # input, output, cache read. Cache writes are 1.25x input (5 min TTL) or 2x input (1 hour TTL).
 PRICES = {
@@ -59,13 +60,13 @@ def find_session(arg):
         path = pathlib.Path(arg)
         if path.suffix == ".jsonl" and path.exists():
             return path
-        path = SAMPLE_DIR / f"{arg}.jsonl"
+        path = SESSIONS_DIR / f"{arg}.jsonl"
         if path.exists():
             return path
         sys.exit(f"No transcript for session {arg}")
-    sessions = sorted(SAMPLE_DIR.glob("*.jsonl"), key=lambda p: p.stat().st_mtime)
+    sessions = sorted(SESSIONS_DIR.glob("*.jsonl"), key=lambda p: p.stat().st_mtime)
     if not sessions:
-        sys.exit(f"No transcripts in {SAMPLE_DIR}")
+        sys.exit(f"No transcripts in {SESSIONS_DIR}")
     return sessions[-1]
 
 

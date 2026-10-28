@@ -13,13 +13,13 @@ up, what to type, and what must be true afterwards.
    recommended option and note the question in **Findings**, so the next run can answer it the same way.
 4. Tick the checklist. Note anything that failed in **Findings** with the date.
 5. If it passed and later scenarios restore it, save it: `scenarios/snapshot.sh save <number>`.
-6. Usage is recorded for you: a Stop hook in `sample-app/.claude/settings.local.json` runs
-   `scenarios/usage.py hook` after every turn and writes the session's tokens and API-equivalent cost
+6. Usage is recorded for you: a Stop hook in `.claude/settings.json` runs
+   `usage.py hook` after every turn and writes the session's tokens and API-equivalent cost
    (subagents included) to `scenarios/usage.csv`, one session per run. The scenario number comes from
    matching the first prompt against each scenario's `Prompt:` block; anything else is recorded as `-`.
    Under each reply the hook shows a line such as `Usage: this turn $0.12 · scenario 08 5.1M tokens, $2.65`.
-   `scenarios/usage.py show [<number>]` lists every run and the average per scenario;
-   `scenarios/usage.py record <number> --note "..."` fixes the number or adds a note to the newest session.
+   `usage.py show [<number>]` lists every run and the average per scenario;
+   `usage.py record <number> --note "..."` fixes the number or adds a note to the newest session.
 
 ## Running automatically
 

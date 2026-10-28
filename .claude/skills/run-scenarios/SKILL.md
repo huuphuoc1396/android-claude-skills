@@ -45,7 +45,7 @@ Read `scenarios/.runs/<run-id>/report.md` (the last line of the output names it)
   judge couldn't see). Name which one it is.
 - `unclear` checks, briefly: they need a human look or a better check in the scenario.
 - That the runner appended a dated line to each scenario's **Findings** (uncommitted), and the usage rows
-  in `scenarios/usage.csv` (`scenarios/usage.py show`).
+  in `scenarios/usage.csv` (`usage.py show`).
 
 Propose fixes to skills or scenarios, but don't edit them unless asked. Don't commit.
 

@@ -544,7 +544,7 @@ def record_usage(scenario, sessions):
     for session in sessions:
         transcript = folder / f"{session}.jsonl"
         if transcript.exists():
-            subprocess.run([sys.executable, str(SCENARIOS / "usage.py"), "record", scenario.id,
+            subprocess.run([sys.executable, str(REPO / "usage.py"), "record", scenario.id,
                             "--session", str(transcript), "--note", "runner"], capture_output=True)
 
 
