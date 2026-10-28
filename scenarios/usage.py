@@ -151,10 +151,13 @@ def cost(model, inp, out, write_5m, write_1h, read, fast):
 
 
 def write_run(transcript, scenario=None, note=None):
-    """Replace the session's rows in usage.csv. Returns False when the session has no usage yet."""
+    """Replace the session's rows in usage.csv.
+
+    Returns (scenario, tokens, cost before, cost now) for the session, or None when it has no usage yet.
+    """
     totals = collect(transcript)
     if not totals:
-        return False
+        return None
     prompt = first_prompt(transcript)
     rows = list(csv.DictReader(CSV.open())) if CSV.exists() else []
     previous = [r for r in rows if r["session"] == transcript.stem]
@@ -175,12 +178,15 @@ def write_run(transcript, scenario=None, note=None):
         writer = csv.DictWriter(f, FIELDS)
         writer.writeheader()
         writer.writerows(rows)
-    return True
+    return (scenario,
+            sum(int(sum(t[k] for k in COUNTS[1:])) for t in totals.values()),
+            sum(float(r["cost_usd"]) for r in previous),
+            sum(t["cost_usd"] for t in totals.values()))
 
 
 def record(args):
     transcript = find_session(args.session)
-    if not write_run(transcript, args.scenario, args.note):
+    if write_run(transcript, args.scenario, args.note) is None:
         sys.exit(f"No usage in {transcript}")
     print(f"Recorded session {transcript.stem}")
     show(argparse.Namespace(scenario=None, session=transcript.stem))
@@ -190,9 +196,16 @@ def hook(_):
     # Never fail the turn: a broken transcript line or a locked CSV only costs one update.
     try:
         event = json.load(sys.stdin)
-        write_run(pathlib.Path(event["transcript_path"]))
+        run = write_run(pathlib.Path(event["transcript_path"]))
     except Exception as error:
         print(f"usage.py: {error}", file=sys.stderr)
+        return
+    if run:
+        scenario, tokens, before, now = run
+        label = f"scenario {scenario}" if scenario != "-" else "session"
+        # systemMessage is shown to the user under the reply; it doesn't enter Claude's context.
+        print(json.dumps({"systemMessage": f"Usage: this turn ${now - before:.2f} · "
+                                           f"{label} {tokens / 1e6:.1f}M tokens, ${now:.2f}"}))
 
 
 def show(args):
