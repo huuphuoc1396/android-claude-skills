@@ -63,7 +63,9 @@ Keep each rule 30–80 lines. Every claim must be backed by a file you read; eve
    file-path evidence for the five sections above.
 
 5. **Draft and review.** Write drafts, then self-check each one:
-   - Globs match the intended files (`git ls-files '<glob>'` or `find`) and nothing unintended.
+   - Globs match the intended files and nothing unintended: `git ls-files ':(glob)<glob>'`. The
+     `:(glob)` prefix is required; without it git lets `*` match `/`, so `feature/*/data/**` would also
+     match `feature/a/b/data/...` and the check would pass on files the rule won't actually cover.
    - Every referenced path exists.
    - No duplication of CLAUDE.md content; no contradiction with it or between rules.
    - Nothing generic that holds for every Android project — only this project's choices.

@@ -68,6 +68,7 @@ Classify what you find:
 |---|---|
 | Frame or image of one screen | A screen |
 | Frames named `<Screen> / <State>`, images named `<screen>-<state>` | States of that screen |
+| Dark, landscape, tablet, large-font, or RTL frame of a screen | A Variants row of that screen |
 | Prototype interaction | A Navigation row, `Source: prototype` |
 | Drawn arrow, connector, or `.drawio` edge | A Navigation row, `Source: drawn ⚠` |
 | No flow in the design | Rows proposed from task.md and the screens, `Source: proposed` until confirmed |
@@ -110,6 +111,9 @@ Use the templates below. Rules:
   A component used on several screens is described in the first screen that uses it and referenced by name
   elsewhere.
 - Set `Fidelity`: `wireframe` (no final copy, colors, or assets), `mockup`, or `final`.
+- **Variants**: fill the table for dark, landscape / tablet, and large font (add RTL if task.md needs it).
+  `no` means not designed, not "not needed"; if task.md requires a variant the design lacks, list it in
+  Cross-check.
 
 Show the user the paths with a short summary (screens and states, asset counts by status, open questions)
 and ask them to review. Set `Status: Confirmed` only when they approve.
@@ -195,6 +199,13 @@ Covers: AC-1, AC-3, EC-2
 ## Assets
 - ic_bookmark, img_empty_saved
 
+## Variants
+| Variant | Designed | Differences |
+|---|---|---|
+| Dark | yes | img_empty_saved uses its dark variant |
+| Landscape / tablet | no | |
+| Large font | no | |
+
 ## Notes
 - <designer notes, verbatim>
 ````
@@ -203,11 +214,13 @@ Covers: AC-1, AC-3, EC-2
 
 When the design changes (new link, new images, or `update` in the request):
 1. Read the current design.md and screen files.
-2. Fetch only the changed frames or images. Match screen files by their stable key. If a Figma frame was
-   renamed, ask whether to rename the file; if a new image matches no screen, ask whether it is a new
-   screen or a renamed one.
+2. Find what changed. Figma gives no per-frame change date, so re-fetch only the structure (frame ids,
+   names, sizes, text) for the link and compare it with the screen files by stable key; images are
+   compared by name and by eye with the saved screenshots. Fetch details and screenshots only for the
+   frames that differ. If a Figma frame was renamed, ask whether to rename the file; if a new image
+   matches no screen, ask whether it is a new screen or a renamed one.
 3. Show the changes as a short list (screens, states, navigation, assets: added / changed / removed) and
    wait for approval.
 4. Apply them, add a Change log line, update `Captured`, and set `Status: Draft` until re-approved.
 5. If `subtasks/` or `implement-plans/` exist next to task.md, list the ones affected and suggest updating
-   them. Do not edit them yourself.
+   them (`slice` for subtasks, `blueprint` for plans). Do not edit them yourself.

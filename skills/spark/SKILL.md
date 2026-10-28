@@ -25,7 +25,8 @@ Accept any mix of:
   confirm it. Leave layout, copy, and assets to `mold`; note the design under `Source`.
 - Ticket or wiki links: read through an available connector. If none is available, ask the user to paste the content.
 
-If `docs/features/<feature>/task.md` already exists for this feature, go to **Updating task.md** below.
+List `docs/features/`. If a folder looks like the same or an overlapping feature (by slug or by its task.md
+Goal), ask whether this is an update to it or a new feature. For an update, go to **Updating task.md** below.
 
 ### 2. Light context read
 
@@ -110,6 +111,8 @@ Rules for the content:
 - Keep it to what was agreed. Don't invent requirements the user didn't confirm.
 
 Show the user the path and ask them to review. Set `Status: Confirmed` only when they approve.
+`Confirmed` may keep open questions only if each names its owner and the step it is needed before, and none
+is needed before the next step (`mold`, `slice`, or `blueprint`). Resolve those first, or keep `Draft`.
 
 ### 6. Finish
 
@@ -126,4 +129,5 @@ When the user asks to change the requirement (in chat or with new material):
 3. Show the proposed changes as a short list (added / changed / removed, with IDs) and wait for approval.
 4. Apply them, keep IDs stable, add a Change log line, and set `Status: Draft` until re-approved.
 5. If `design.md`, `subtasks/`, or `implement-plans/` exist next to task.md, list the ones affected by the
-   change and suggest updating them (`mold` for design.md). Do not edit them yourself.
+   change and suggest updating them (`mold` for design.md, `slice` for subtasks, `blueprint` for plans). Do
+   not edit them yourself.

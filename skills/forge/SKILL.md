@@ -14,8 +14,11 @@ Do not re-ask anything answered in the linked task.md / subtask / plan.
 
 1. Read the plan (`docs/features/<feature>/implement-plan.md` or `implement-plans/NN-<slug>.md`) and the
    requirement it links to.
-   - If `Status` is not `Approved`, ask the user to confirm the plan first.
+   - If `Status` is `Draft`, ask the user to confirm the plan first. If it is `Done`, say so and stop.
    - If no plan exists, suggest `blueprint` and stop.
+   - **Resuming**: if `Status` is `In progress`, or any step is ticked (`✅`), continue the earlier run.
+     Compile the modules of the ticked steps (main and unit test sources) to confirm they still build,
+     then start at the first unticked step. If they don't build, report it before writing anything.
 2. Read `CLAUDE.md` and the `.claude/rules/*.md` matching the modules in the plan's Changes overview.
    If the plan has a Design mapping, also read the screen files (`screens/<screen>.md`) it names, and
    open their screenshots only when the layout text isn't enough.
@@ -23,12 +26,15 @@ Do not re-ask anything answered in the linked task.md / subtask / plan.
 4. Set the plan `Status: In progress` and, if the plan came from a subtask, the subtask's
    `Status: In progress`.
 
-## For each step, in order
+## For each unticked step, in order
 
 1. **Read before writing.** Open the files to modify and the reference/reuse components the step names.
    Match the surrounding code: naming, structure, comment density, idioms.
 2. **Write the code** for the step — only what the step describes. For UI from a design:
-   - Copy text verbatim from the screen file's Copy section into string resources.
+   - Copy text verbatim from the screen file's Copy section into the string resources the plan's Design
+     mapping names (key, module, locales); reuse the shared strings it lists instead of adding new ones.
+   - Handle each Variant the way the Design mapping says (theme attribute, qualified resource, or layout
+     logic).
    - Add assets as the plan's Assets table says. Convert simple SVGs (paths, fills, strokes) to
      VectorDrawable XML; an SVG with gradients, masks, filters, or text gets a placeholder instead, noted
      as a deviation. `needs-export` assets get a placeholder.
@@ -77,7 +83,8 @@ verified or re-recorded.
    failed attempts on the same failure, stop and report it with the output.
 3. If formatting changed files, re-run the touched modules' build and unit tests once.
 4. Walk the plan's Traceability table: confirm each AC/EC has code and a passing test (or a manual check).
-5. Set the plan `Status: Done` and, if the input was a subtask, its `Status: Done`.
+5. Only if every check in step 1 passed and step 4 found no gap: set the plan `Status: Done` and, if the
+   input was a subtask, its `Status: Done`. Otherwise leave both `In progress` and say why in the report.
 6. Report to the user:
    - Steps done, files changed (grouped by module), deviations.
    - Commands run and their results, stated honestly (pass / fail with output).

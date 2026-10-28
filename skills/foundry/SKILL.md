@@ -23,10 +23,14 @@ Overrides that apply in both modes:
 ## 1. Start
 
 1. Collect the input the same way `spark` does (chat text, files, images, ticket links).
-2. If `docs/features/<feature>/` already has artifacts, resume from the first unfinished one instead of
-   starting over: task.md not Confirmed → spark; design.md not Confirmed, or a design in the input
-   and no design.md → mold; subtasks not written → slice; a subtask or task without an Approved
-   plan → blueprint; an Approved or In progress plan → forge.
+2. If `docs/features/<feature>/` already has artifacts, resume instead of starting over.
+   - **Changed input first.** If the input brings a requirement or design that differs from task.md or
+     design.md (new behavior, a new design link or images, "change X"), it is a change request: run
+     spark's Updating flow for requirement changes, mold's Updating flow for design changes, then
+     slice's Updating flow if subtasks exist, then blueprint's Updating flow for each affected plan.
+   - **Then the first unfinished artifact**: task.md not Confirmed → spark; design.md not Confirmed, or
+     a design in the input and no design.md → mold; subtasks not written → slice; then the first
+     subtask by `NN` that is not `Done`: an Approved or In progress plan → forge, otherwise → blueprint.
 3. Ask, in one round (skip any question the user's request already answers):
    - **Mode**
      - **Auto (recommended)** — follow the agent's recommended option at each decision and ask only
@@ -35,6 +39,9 @@ Overrides that apply in both modes:
        blueprint as each skill describes.
    - **Commit after each subtask?** — Yes, using the commit style in CLAUDE.md (recommended when the
      feature is split into subtasks) / No, leave everything uncommitted for review.
+4. If the user chose to commit and the current branch is the default branch (`main`, `master`, `develop`,
+   or the remote's HEAD), create a feature branch first, named by CLAUDE.md's branch convention or
+   `feature/<feature>`, and tell the user. Never commit to the default branch.
 
 ## 2. Run the stages
 
@@ -46,10 +53,24 @@ Overrides that apply in both modes:
 4. For each subtask in order (or once for task.md):
    1. **blueprint** → the plan.
    2. **forge** → code and unit tests.
-   3. Commit if the user chose it. Then continue with the next subtask.
+   3. If forge left the plan `In progress` (tests failing, a Traceability gap), stop: show its report and
+      do not commit or start the next subtask, in either mode. Otherwise commit if the user chose it, then
+      continue with the next subtask.
 
 Both modes stop at the same hard stops of `forge`: a large deviation from the plan, or the same
 compile error or test failure after 3 attempts.
+
+### Keeping the context small
+
+Every artifact lives on disk, so a stage never needs this conversation's history to run.
+- **Auto mode**: run each subtask's blueprint + forge in its own subagent. Give it the subtask path, the
+  mode, the "When auto mode still asks" list, and the instruction to invoke `blueprint` then `forge` with
+  the Skill tool and not to commit. It returns forge's report, or the question it stopped on. Ask that
+  question here and start a new subagent with the answer; it records it where the stage keeps decisions
+  (the plan's `## Decisions`, or `## Deviations` for forge), and blueprint and forge resume from the files. Run subagents one at a time: subtasks build on each other. Commit here,
+  after checking the plan's Status.
+- **Interactive mode**: stages stay in this conversation, since they ask the user directly. After every
+  two subtasks, if more remain, offer to continue in a fresh session; foundry resumes from the files.
 
 ## 3. Interactive mode
 

@@ -24,6 +24,7 @@ Do not re-ask anything answered in the linked task.md / subtask / plan.
   line links (all of them when planning from task.md). Do not open the design itself (Figma, images).
 - If the requirement or design.md is Draft or has open questions that block planning, list them and ask
   first.
+- If the plan file already exists (see the output path in step 5), go to **Updating** below.
 
 ### 2. Load the project rules
 
@@ -43,7 +44,10 @@ Find, with file paths as evidence:
 - **Design mapping** (when design.md exists): each screen to a screen and route, each component to an
   existing design system component (or a reason for a new one), each token to its theme name, each
   Navigation row to how navigation is wired, and each asset to its destination (shared design system
-  module or the feature module) and format (VectorDrawable, WebP, `res/raw` for Lottie).
+  module or the feature module) and format (VectorDrawable, WebP, `res/raw` for Lottie). Map each Copy
+  line to a string resource (key, module, existing shared string to reuse, which locales need it;
+  `_placeholder_` copy is listed under Risks), and each designed Variant to how it is handled (theme
+  attribute, `-night` / `-land` / `-sw600dp` resource, or layout logic).
 
 Reuse checklist (skip categories the requirement doesn't touch):
 
@@ -99,7 +103,7 @@ Status: Draft | Approved | In progress | Done
 
 ## Design mapping
 <Only when design.md exists.>
-| Design (screen / component / token / navigation) | Code |
+| Design (screen / component / token / navigation / copy / variant) | Code |
 
 ## Assets
 <Only when design.md lists assets.>
@@ -150,3 +154,15 @@ subtask, set its `Status: Planned` at the same time.
 ### 7. Finish
 
 Suggest running `forge` on the plan. Do not start coding.
+
+## Updating
+
+When the plan exists and the requirement, design, or the user's request has changed:
+1. Read the plan, its Status, and which steps are ticked (`✅`, done by `forge`).
+2. Work out what the change affects through the AC/EC IDs and design screens it touches, using
+   Traceability and Design mapping. Explore and ask (steps 3–4) only for the affected part.
+3. Show the changes as a short list (steps added / changed / removed, decisions changed) and wait for
+   approval. Ticked steps are never rewritten: a change to finished work becomes a new step after them.
+   Never renumber steps; new steps go at the end or take a suffix (`Step 3b`).
+4. Apply them, update Traceability, add a `## Change log` line, and set `Status: Draft` until re-approved.
+   If any step was ticked, say that `forge` should resume from the first unticked step.

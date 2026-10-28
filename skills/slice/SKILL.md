@@ -33,9 +33,13 @@ Use when the task touches several screens or layers, or would produce more than 
   guard (hide behind a flag or keep the entry point out until the flow works).
 - **Size**: about ≤400 lines of production code and ≤3 modules. Split further if bigger; merge if trivial.
 - **Coverage**: every `AC-n` and `EC-n` from task.md lands in exactly one subtask (or is partially covered
-  in one and completed in a later one, stated explicitly). Nothing new is invented.
+  in one and completed in a later one, stated explicitly). Nothing new is invented, and nothing is
+  dropped: moving an AC/EC out of this feature is a requirement change, made in task.md through `spark`,
+  not by leaving it out of the subtasks.
 
 ## Process
+
+If `docs/features/<feature>/subtasks/` already has files, go to **Updating** below.
 
 1. **Read** task.md (status should be Confirmed; if Draft, warn the user), CLAUDE.md, and skim the
    areas the feature touches — only to judge size and layers, not to design. If `design.md` exists, read
@@ -49,7 +53,8 @@ Use when the task touches several screens or layers, or would produce more than 
    | # | Subtask | Goal (one line) | Covers | Layers | Depends on | Size |
 
    - Size is S / M / L against the ≤400-line limit.
-   - Below the table, list any AC/EC that is split across subtasks or deferred.
+   - Below the table, list any AC/EC that is split across subtasks, and check that every AC/EC in
+     task.md appears in the table.
    - Then list the candidate merges as plain text, so the user can weigh them while reading. A candidate is
      two adjacent subtasks where the later one depends only on the earlier one. Write each as, for example,
      "01 + 02 (≈ M, 4 modules)". Mark a merge "(over the size limit)" if it would exceed ~400 lines or 3
@@ -61,7 +66,9 @@ Use when the task touches several screens or layers, or would produce more than 
    - Scope questions, only if something is unclear. Typical:
      - A slice is too big — which part ships first?
      - An AC could live in two subtasks — which?
-     - Something isn't needed for a first release — defer or keep?
+     - Something isn't needed for a first release — put it in the last subtask, or take it out of the
+       feature? Taking it out means stopping here and updating task.md through `spark` (moved to Out of
+       scope), then slicing the updated task.md.
    - The grouping question, always, even when nothing else is unclear. The user decides how many reviews
      and commits the feature takes.
      - Use one multi-select question with the candidate merges from step 3, including their combined size
@@ -116,3 +123,23 @@ Keep AC/EC IDs identical to task.md so plans, code reviews, and tests can trace 
 
 New subtasks start as `Todo`. `blueprint` sets `Planned` when their plan is approved; `forge`
 sets `In progress` when it starts and `Done` when it finishes.
+
+## Updating
+
+When task.md or design.md changed after the subtasks were written:
+1. Read task.md (its Change log shows what changed), design.md if it exists, and every subtask with its
+   Status.
+2. Find the affected subtasks through the AC/EC IDs and design screens the change touches.
+3. Draft the changes under these rules:
+   - `Done` and `In progress` subtasks are never rewritten. A change to their scope becomes a new
+     subtask.
+   - `Todo` subtasks may be edited, split, merged, or removed.
+   - A `Planned` subtask that changes goes back to `Todo`, and its plan is listed for `blueprint`
+     Updating.
+   - Never renumber. New subtasks take the next free `NN` and declare `Depends on` as needed.
+   - Every AC/EC in task.md is still covered by exactly one subtask (or split, stated explicitly), and
+     removed ones (`~~AC-n~~`) are covered by none.
+4. Show the changes in chat as in step 3 (added / changed / removed, with IDs and the subtasks
+   affected), and wait for approval. Removing a subtask file needs that approval.
+5. Apply them, update task.md's `## Subtasks` links, and list the plans in `implement-plans/` that need
+   `blueprint` Updating. Do not edit plans yourself.
