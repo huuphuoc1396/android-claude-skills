@@ -1,0 +1,42 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="bookmarks" name="Bookmarks">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="news" value="&lt;b&gt;Spaceflight News&lt;/b&gt;&lt;br&gt;&lt;br&gt;Top bar: &quot;Spaceflight News&quot; · action icon: bookmark (outline)&lt;br&gt;&lt;br&gt;List item:&lt;br&gt;[news site]&lt;br&gt;[title]&lt;br&gt;[summary, 3 lines]&lt;br&gt;bookmark toggle on the right (outline / filled)&lt;br&gt;&lt;br&gt;(empty and error states unchanged)" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="360" height="640" as="geometry" />
+        </mxCell>
+
+        <mxCell id="bookmarks" value="&lt;b&gt;Bookmarks&lt;/b&gt;&lt;br&gt;&lt;br&gt;Top bar: back arrow · &quot;Bookmarks&quot;&lt;br&gt;&lt;br&gt;List item (same as news item):&lt;br&gt;[news site]&lt;br&gt;[title]&lt;br&gt;[summary, 3 lines]&lt;br&gt;bookmark toggle (filled)&lt;br&gt;&lt;br&gt;Newest bookmark first" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="560" y="80" width="360" height="640" as="geometry" />
+        </mxCell>
+
+        <mxCell id="bookmarks-empty" value="&lt;b&gt;Bookmarks / Empty&lt;/b&gt;&lt;br&gt;&lt;br&gt;Top bar: back arrow · &quot;Bookmarks&quot;&lt;br&gt;&lt;br&gt;[illustration: empty bookmark]&lt;br&gt;&quot;No bookmarks yet&quot;&lt;br&gt;&quot;Tap the bookmark icon on an article to save it here.&quot;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="80" width="360" height="640" as="geometry" />
+        </mxCell>
+
+        <mxCell id="settings" value="&lt;b&gt;Bookmark Settings&lt;/b&gt;&lt;br&gt;&lt;br&gt;Top bar: back arrow · &quot;Bookmark settings&quot;&lt;br&gt;&lt;br&gt;Switch: &quot;Sync bookmarks&quot;&lt;br&gt;Button: &quot;Clear all bookmarks&quot;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="780" width="360" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="note-swipe" value="Swipe left on a bookmark to remove it.&lt;br&gt;Snackbar: &quot;Bookmark removed&quot; · action &quot;Undo&quot;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;size=14;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="560" y="760" width="300" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" value="tap bookmark icon in top bar" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="news" target="bookmarks">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="no bookmarks" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;" edge="1" parent="1" source="bookmarks" target="bookmarks-empty">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="tap item → Article" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="bookmarks">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="740" y="20" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

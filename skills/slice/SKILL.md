@@ -38,7 +38,9 @@ Use when the task touches several screens or layers, or would produce more than 
 ## Process
 
 1. **Read** task.md (status should be Confirmed; if Draft, warn the user), CLAUDE.md, and skim the
-   areas the feature touches — only to judge size and layers, not to design.
+   areas the feature touches — only to judge size and layers, not to design. If `design.md` exists, read
+   it (not the screen files): its screens, states, and Navigation help size the slices. Slices still
+   follow user flows, not one subtask per screen.
 2. **Draft the split**: subtasks, the ACs/ECs each covers, layers touched, dependencies.
 3. **Show the outline in chat for preview, and stop.** Write it as plain chat text: short, just enough to
    judge the split, no files yet. Do not ask a question with a question tool in this turn; a question dialog
@@ -85,6 +87,7 @@ Use when the task touches several screens or layers, or would produce more than 
 
 Feature: [task.md](../task.md)
 Depends on: <none | NN-...>
+Design: <none | [<screen>](../screens/<screen>.md), ... (with the states this subtask covers)>
 Status: Todo | Planned | In progress | Done
 
 ## Goal

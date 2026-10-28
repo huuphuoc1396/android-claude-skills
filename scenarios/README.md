@@ -41,3 +41,4 @@ Scenarios build on each other's output: run them in number order, or reset and r
 | [07](07-spark-small-change.md) | spark → blueprint (no slice) | 01 |
 | [08](08-foundry-auto.md) | foundry, Auto mode | 01, 02 |
 | [09](09-foundry-interactive.md) | foundry, Interactive mode | 01, 02 |
+| [10](10-mold-bookmarks.md) | mold, from a draw.io wireframe | 03 |

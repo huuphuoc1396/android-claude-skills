@@ -20,7 +20,10 @@ Do not re-ask anything answered in the linked task.md / subtask / plan.
 - **task.md / subtask file**: read it, plus task.md when the input is a subtask. Use its `AC-n` / `EC-n` IDs.
 - **Chat, ticket, bug report**: extract acceptance criteria (Given/When/Then, numbered `AC-1...`) and edge
   cases yourself, and confirm them with the user before planning. Pick a feature slug for the output path.
-- If the requirement is Draft or has open questions that block planning, list them and ask first.
+- **Design**: if `design.md` exists next to task.md, read it and the screen files the subtask's `Design:`
+  line links (all of them when planning from task.md). Do not open the design itself (Figma, images).
+- If the requirement or design.md is Draft or has open questions that block planning, list them and ask
+  first.
 
 ### 2. Load the project rules
 
@@ -37,6 +40,10 @@ Find, with file paths as evidence:
   needs a reason why no existing one fits.
 - **Patterns to follow**: state holder and UI state shape, error/result handling, threading, model mapping,
   resource naming, test style.
+- **Design mapping** (when design.md exists): each screen to a screen and route, each component to an
+  existing design system component (or a reason for a new one), each token to its theme name, each
+  Navigation row to how navigation is wired, and each asset to its destination (shared design system
+  module or the feature module) and format (VectorDrawable, WebP, `res/raw` for Lottie).
 
 Reuse checklist (skip categories the requirement doesn't touch):
 
@@ -90,6 +97,14 @@ Status: Draft | Approved | In progress | Done
 ## Reuse
 | Need | Existing component | Location |
 
+## Design mapping
+<Only when design.md exists.>
+| Design (screen / component / token / navigation) | Code |
+
+## Assets
+<Only when design.md lists assets.>
+| Asset | Status | Action | Destination | Step |
+
 ## Changes overview
 | Module | Files (new / modified) | Why |
 
@@ -119,6 +134,9 @@ Rules for steps:
 - Every AC and EC appears in Traceability with at least one step and one test (or a manual check, stated).
 - Only the files the requirement needs. No speculative abstractions, base classes, or "for later" hooks.
 - Commands are the real ones from CLAUDE.md.
+- Assets are added in the step that first uses them: `provided` ones converted from `assets/` into the
+  destination, `exists` and `reuse` ones referenced. `needs-export` ones get a placeholder, and the plan
+  lists them under Risks.
 - If a step changes the public API of a shared module, its Compile line also covers the modules that
   depend on it, and Changes overview lists them as affected.
 

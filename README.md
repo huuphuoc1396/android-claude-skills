@@ -9,17 +9,18 @@
 | [scout](skills/scout/SKILL.md) | Explores an Android codebase and generates (or updates) a concise `CLAUDE.md`. |
 | [rulebook](skills/rulebook/SKILL.md) | Generates path-scoped rule files in `.claude/rules/`, one per architectural layer. |
 | [spark](skills/spark/SKILL.md) | Clarifies a feature idea through rounds of questions, then writes `docs/features/<feature>/task.md`. |
+| [mold](skills/mold/SKILL.md) | Optional: reads the design once (Figma, screenshots, draw.io) and writes `design.md` plus one file per screen: layout, states, copy, navigation, assets. |
 | [slice](skills/slice/SKILL.md) | Optional: splits a large `task.md` into ordered, reviewable vertical-slice subtasks. |
 | [blueprint](skills/blueprint/SKILL.md) | Writes an implementation plan of ordered, buildable steps mapped to acceptance criteria. |
 | [forge](skills/forge/SKILL.md) | Executes an approved plan: production code and unit tests, compiling after each step. |
-| [foundry](skills/foundry/SKILL.md) | Runs spark → [slice] → blueprint → forge end to end, in **Auto** mode (follows the agent's recommendations, asks only when needed) or **Interactive** mode (asks at every stage). |
+| [foundry](skills/foundry/SKILL.md) | Runs spark → [mold] → [slice] → blueprint → forge end to end, in **Auto** mode (follows the agent's recommendations, asks only when needed) or **Interactive** mode (asks at every stage). |
 
 ## Workflow
 
 ```
-scout → rulebook                       (once per repo)
-spark → [slice] → blueprint → forge    (per feature)
-foundry                                (the same, in one go)
+scout → rulebook                                (once per repo)
+spark → [mold] → [slice] → blueprint → forge    (per feature)
+foundry                                         (the same, in one go)
 ```
 
 ## Repository layout

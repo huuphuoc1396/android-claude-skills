@@ -21,7 +21,8 @@ checks to run before finishing.
 Accept any mix of:
 - Chat text.
 - File paths (markdown, PRD, notes): read them fully.
-- Images, screenshots, designs: describe what you see (screens, states, copy, actions) and confirm it.
+- Images, screenshots, designs: take only what the requirement needs (screens, states, actions, flow) and
+  confirm it. Leave layout, copy, and assets to `mold`; note the design under `Source`.
 - Ticket or wiki links: read through an available connector. If none is available, ask the user to paste the content.
 
 If `docs/features/<feature>/task.md` already exists for this feature, go to **Updating task.md** below.
@@ -104,6 +105,8 @@ Rules for the content:
 - Every acceptance criterion is observable and testable by a user or a test; no "should work well".
 - IDs (`AC-n`, `EC-n`) are stable: never renumber; mark removed ones `~~AC-3~~ (removed: reason)`.
 - Edge cases state the expected behavior, not just the situation.
+- UI states say when a state happens and what the user can do; how it looks and its exact copy belong in
+  `design.md` (`mold`).
 - Keep it to what was agreed. Don't invent requirements the user didn't confirm.
 
 Show the user the path and ask them to review. Set `Status: Confirmed` only when they approve.
@@ -111,6 +114,7 @@ Show the user the path and ask them to review. Set `Status: Confirmed` only when
 ### 6. Finish
 
 Suggest the next step without running it:
+- A design or flow exists (Figma link, screenshots, draw.io): `mold` first, then the steps below.
 - Large task (several screens, several layers, or more than one reviewable diff): `slice`.
 - Small task: `blueprint` directly on task.md.
 
@@ -121,5 +125,5 @@ When the user asks to change the requirement (in chat or with new material):
 2. Ask questions only about what the change leaves unclear, in the same round style.
 3. Show the proposed changes as a short list (added / changed / removed, with IDs) and wait for approval.
 4. Apply them, keep IDs stable, add a Change log line, and set `Status: Draft` until re-approved.
-5. If `subtasks/` or `implement-plans/` exist next to task.md, list the ones affected by the change and
-   suggest updating them. Do not edit them yourself.
+5. If `design.md`, `subtasks/`, or `implement-plans/` exist next to task.md, list the ones affected by the
+   change and suggest updating them (`mold` for design.md). Do not edit them yourself.

@@ -17,6 +17,8 @@ Do not re-ask anything answered in the linked task.md / subtask / plan.
    - If `Status` is not `Approved`, ask the user to confirm the plan first.
    - If no plan exists, suggest `blueprint` and stop.
 2. Read `CLAUDE.md` and the `.claude/rules/*.md` matching the modules in the plan's Changes overview.
+   If the plan has a Design mapping, also read the screen files (`screens/<screen>.md`) it names, and
+   open their screenshots only when the layout text isn't enough.
 3. Check `git status`. If there are unrelated uncommitted changes, tell the user before touching anything.
 4. Set the plan `Status: In progress` and, if the plan came from a subtask, the subtask's
    `Status: In progress`.
@@ -25,7 +27,11 @@ Do not re-ask anything answered in the linked task.md / subtask / plan.
 
 1. **Read before writing.** Open the files to modify and the reference/reuse components the step names.
    Match the surrounding code: naming, structure, comment density, idioms.
-2. **Write the code** for the step — only what the step describes.
+2. **Write the code** for the step — only what the step describes. For UI from a design:
+   - Copy text verbatim from the screen file's Copy section into string resources.
+   - Add assets as the plan's Assets table says. Convert simple SVGs (paths, fills, strokes) to
+     VectorDrawable XML; an SVG with gradients, masks, filters, or text gets a placeholder instead, noted
+     as a deviation. `needs-export` assets get a placeholder.
 3. **Write the unit tests** listed in the step, using the project's test doubles and rules (no new mocking
    library unless the project uses one).
 4. **Compile** the modules the step touched, main and unit test sources, without running tests (e.g.
@@ -76,5 +82,6 @@ verified or re-recorded.
    - Steps done, files changed (grouped by module), deviations.
    - Commands run and their results, stated honestly (pass / fail with output).
    - What was not verified: UI / instrumented / screenshot tests, manual "How to test" steps.
+   - Placeholder assets still waiting for a real file, if any.
    - Do not commit. Ask whether to commit once they have reviewed, using the commit style in CLAUDE.md
      (or the style of recent `git log` if CLAUDE.md doesn't state one).

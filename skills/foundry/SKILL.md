@@ -1,6 +1,6 @@
 ---
 name: foundry
-description: Run the full feature flow in an Android project — spark, optional slice, blueprint, and forge — from one request, either following the agent's recommendations and asking only when needed, or asking at every stage. Use when the user wants a feature taken from idea to implemented code in one go.
+description: Run the full feature flow in an Android project — spark, optional mold and slice, blueprint, and forge — from one request, either following the agent's recommendations and asking only when needed, or asking at every stage. Use when the user wants a feature taken from idea to implemented code in one go.
 ---
 
 # Foundry
@@ -9,8 +9,8 @@ Goal: take a feature from idea to working code and unit tests by running the sta
 the level of user involvement the user picks at the start.
 
 ```
-spark → [slice] → blueprint → forge
-                  └── repeated per subtask ──┘
+spark → [mold] → [slice] → blueprint → forge
+                           └── repeated per subtask ──┘
 ```
 
 Each stage follows its own skill (invoke it with the Skill tool). This skill only decides the order, the
@@ -24,13 +24,14 @@ Overrides that apply in both modes:
 
 1. Collect the input the same way `spark` does (chat text, files, images, ticket links).
 2. If `docs/features/<feature>/` already has artifacts, resume from the first unfinished one instead of
-   starting over: task.md not Confirmed → spark; subtasks not written → slice; a subtask or
-   task without an Approved plan → blueprint; an Approved or In progress plan → forge.
+   starting over: task.md not Confirmed → spark; design.md not Confirmed, or a design in the input
+   and no design.md → mold; subtasks not written → slice; a subtask or task without an Approved
+   plan → blueprint; an Approved or In progress plan → forge.
 3. Ask, in one round (skip any question the user's request already answers):
    - **Mode**
      - **Auto (recommended)** — follow the agent's recommended option at each decision and ask only
        when needed (see "When auto mode still asks").
-     - **Interactive** — ask the questions and approvals of spark, slice, and
+     - **Interactive** — ask the questions and approvals of spark, mold, slice, and
        blueprint as each skill describes.
    - **Commit after each subtask?** — Yes, using the commit style in CLAUDE.md (recommended when the
      feature is split into subtasks) / No, leave everything uncommitted for review.
@@ -38,9 +39,11 @@ Overrides that apply in both modes:
 ## 2. Run the stages
 
 1. **spark** → `task.md`.
-2. **slice**, only if the task meets slice's "When to use". Otherwise go straight to step 3 with
+2. **mold** → `design.md`, only if the input has a design or flow (Figma link, screenshots, draw.io).
+   With no design, skip it; never sketch one.
+3. **slice**, only if the task meets slice's "When to use". Otherwise go straight to step 4 with
    task.md.
-3. For each subtask in order (or once for task.md):
+4. For each subtask in order (or once for task.md):
    1. **blueprint** → the plan.
    2. **forge** → code and unit tests.
    3. Commit if the user chose it. Then continue with the next subtask.
@@ -61,6 +64,9 @@ Run each stage skill, with these overrides:
   the artifact where the skill keeps decisions, marked `(auto)` with a one-line reason:
   - spark: task.md, as normal content plus a line under `## Open questions` →
     `- [x] <question> → <choice> (auto: <reason>)`.
+  - mold: design.md `## Open questions` → `- [x] <question> → <choice> (auto: <reason>)`. Drawn or
+    proposed Navigation rows are accepted as they are and listed for review. Requirements the design
+    reveals are added to task.md through spark's Updating flow, marked `(auto)`.
   - slice: keep the split as proposed unless a subtask is S and trivial, then merge it into a
     neighbour.
   - blueprint: `## Decisions` → `- <Decision> (auto) — <reason>; rejected: <alternative>`.
@@ -78,6 +84,7 @@ answer it:
   with existing behavior that the input doesn't say to change.
 - A choice is hard to reverse or affects other features: database schema change or migration, new
   library, new module, change to a shared module's public API, removing or changing existing behavior.
+- The design can't be read: a Figma link with no Figma MCP and no `$FIGMA_TOKEN`.
 - Anything the stage skills treat as a hard stop.
 
 After the answer, carry on in auto mode.
@@ -85,10 +92,10 @@ After the answer, carry on in auto mode.
 ## 5. Finish
 
 Report to the user:
-- Artifacts written: task.md, subtasks, plans (paths).
+- Artifacts written: task.md, design.md, subtasks, plans (paths).
 - Per subtask: status, files changed by module, commit hash if committed.
-- **Auto decisions to review**: every `(auto)` decision across task.md and plans, as a list with links,
-  so the user can review what was chosen for them in one place.
+- **Auto decisions to review**: every `(auto)` decision across task.md, design.md, and plans, as a list
+  with links, so the user can review what was chosen for them in one place.
 - What was not verified: the `forge` report's list (UI, instrumented, screenshot tests, manual
   "How to test" steps).
 - If nothing was committed, ask whether to commit.
