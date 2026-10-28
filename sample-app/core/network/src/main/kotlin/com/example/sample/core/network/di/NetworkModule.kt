@@ -1,8 +1,9 @@
 package com.example.sample.core.network.di
 
-import com.example.sample.core.network.NewsNetworkDataSource
-import com.example.sample.core.network.retrofit.NewsApi
-import com.example.sample.core.network.retrofit.RetrofitNewsNetwork
+import com.example.sample.core.network.TmdbNetworkDataSource
+import com.example.sample.core.network.retrofit.RetrofitTmdbNetwork
+import com.example.sample.core.network.retrofit.TmdbApi
+import com.example.sample.core.network.retrofit.TmdbRequestInterceptor
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -14,7 +15,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
-private const val BASE_URL = "https://api.spaceflightnewsapi.net/"
+private const val TMDB_BASE_URL = "https://api.themoviedb.org/3/"
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -27,17 +28,17 @@ internal object NetworkModule {
 
     @Provides
     @Singleton
-    fun providesNewsApi(okHttpClient: OkHttpClient): NewsApi = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .client(okHttpClient)
+    fun providesTmdbApi(okHttpClient: OkHttpClient): TmdbApi = Retrofit.Builder()
+        .baseUrl(TMDB_BASE_URL)
+        .client(okHttpClient.newBuilder().addInterceptor(TmdbRequestInterceptor()).build())
         .addConverterFactory(GsonConverterFactory.create())
         .build()
-        .create(NewsApi::class.java)
+        .create(TmdbApi::class.java)
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
 internal interface NetworkBindsModule {
     @Binds
-    fun bindsNewsNetworkDataSource(impl: RetrofitNewsNetwork): NewsNetworkDataSource
+    fun bindsTmdbNetworkDataSource(impl: RetrofitTmdbNetwork): TmdbNetworkDataSource
 }

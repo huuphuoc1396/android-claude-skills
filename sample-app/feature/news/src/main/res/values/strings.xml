@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="feature_news_title">Spaceflight News</string>
-    <string name="feature_news_empty">No articles yet.</string>
-    <string name="feature_news_error">Couldn\'t load articles. Check your connection and try again.</string>
-    <string name="feature_news_retry">Retry</string>
-</resources>

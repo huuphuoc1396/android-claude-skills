@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_home_heading">O que você quer assistir hoje?</string>
+    <string name="feature_home_search">Buscar</string>
+    <string name="feature_home_tab_films">Filmes</string>
+    <string name="feature_home_tab_series">Séries</string>
+    <string name="feature_home_tab_anime">Animes</string>
+    <string name="feature_home_tab_novelas">Novelas</string>
+    <string name="feature_home_popular">Mais populares</string>
+    <string name="feature_home_error">Não foi possível carregar</string>
+    <string name="feature_home_retry">Tentar novamente</string>
+    <string name="feature_home_profile">Perfil</string>
+</resources>

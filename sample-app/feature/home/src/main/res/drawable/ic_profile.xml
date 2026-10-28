@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Placeholder until the designer exports ic_profile (design.md: needs-export). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+    <path
+        android:fillColor="#FF303243"
+        android:pathData="M20,0a20,20 0,1 1,0 40a20,20 0,1 1,0 -40z" />
+    <path
+        android:fillColor="#FFCCCCCC"
+        android:pathData="M20,10a6,6 0,1 1,0 12a6,6 0,1 1,0 -12z M8,34c2,-6 7,-9 12,-9s10,3 12,9z" />
+</vector>

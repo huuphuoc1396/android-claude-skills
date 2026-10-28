@@ -13,6 +13,11 @@ android {
         versionName = "0.1.0"
     }
 
+    // Lets Android 13+ offer English and Portuguese in the per-app language settings.
+    androidResources {
+        generateLocaleConfig = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -23,7 +28,7 @@ android {
 
 dependencies {
     implementation(project(":core:designsystem"))
-    implementation(project(":feature:news"))
+    implementation(project(":feature:home"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

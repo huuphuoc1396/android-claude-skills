@@ -1,7 +1,7 @@
 package com.example.sample.core.data.di
 
-import com.example.sample.core.data.repository.ArticleRepository
-import com.example.sample.core.data.repository.OfflineFirstArticleRepository
+import com.example.sample.core.data.repository.DefaultTitleRepository
+import com.example.sample.core.data.repository.TitleRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -11,5 +11,5 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 internal interface DataModule {
     @Binds
-    fun bindsArticleRepository(impl: OfflineFirstArticleRepository): ArticleRepository
+    fun bindsTitleRepository(impl: DefaultTitleRepository): TitleRepository
 }
