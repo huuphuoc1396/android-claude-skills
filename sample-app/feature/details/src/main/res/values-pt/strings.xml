@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_details_back">Voltar</string>
+    <string name="feature_details_cast">Elenco principal</string>
+    <string name="feature_details_genres">Categoria(s)</string>
+    <string name="feature_details_recommendations">Recomendações</string>
+    <string name="feature_details_error">Não foi possível carregar</string>
+    <string name="feature_details_retry">Tentar novamente</string>
+</resources>

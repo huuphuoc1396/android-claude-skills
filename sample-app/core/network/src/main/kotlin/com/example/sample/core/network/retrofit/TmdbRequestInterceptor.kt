@@ -19,3 +19,6 @@ internal class TmdbRequestInterceptor : Interceptor {
 
 /** Any Portuguese gets Brazilian Portuguese content; every other language gets English. */
 internal fun tmdbLanguage(locale: Locale): String = if (locale.language == "pt") "pt-BR" else "en-US"
+
+/** Release dates follow the content language: Brazil for Portuguese, the US otherwise. */
+internal fun tmdbRegion(locale: Locale): String = if (locale.language == "pt") "BR" else "US"

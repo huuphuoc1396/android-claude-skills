@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.example.sample.feature.details.navigation.detailsScreen
+import com.example.sample.feature.details.navigation.navigateToDetails
 import com.example.sample.feature.home.navigation.HomeDestination
 import com.example.sample.feature.home.navigation.homeScreen
 
@@ -16,6 +18,10 @@ fun SampleNavHost(modifier: Modifier = Modifier) {
         startDestination = HomeDestination,
         modifier = modifier,
     ) {
-        homeScreen()
+        homeScreen(onTitleClick = navController::navigateToDetails)
+        detailsScreen(
+            onBack = navController::popBackStack,
+            onTitleClick = navController::navigateToDetails,
+        )
     }
 }

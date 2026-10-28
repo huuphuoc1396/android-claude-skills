@@ -1,12 +1,22 @@
 package com.example.sample.core.data.repository
 
+import com.example.sample.core.data.model.CastMember
 import com.example.sample.core.data.model.Category
 import com.example.sample.core.data.model.MediaType
 import com.example.sample.core.data.model.Title
+import com.example.sample.core.data.model.TitleDetails
 import com.example.sample.core.data.testdoubles.FakeTmdbNetworkDataSource
 import com.example.sample.core.network.TmdbDiscoverQuery
 import com.example.sample.core.network.TmdbMediaType
+import com.example.sample.core.network.model.NetworkCast
+import com.example.sample.core.network.model.NetworkCountryReleases
+import com.example.sample.core.network.model.NetworkCredits
+import com.example.sample.core.network.model.NetworkGenre
+import com.example.sample.core.network.model.NetworkPage
+import com.example.sample.core.network.model.NetworkReleaseDate
+import com.example.sample.core.network.model.NetworkReleaseDates
 import com.example.sample.core.network.model.NetworkTitle
+import com.example.sample.core.network.model.NetworkTitleDetails
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -15,6 +25,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
+import java.time.LocalDate
 
 class DefaultTitleRepositoryTest {
     private val testScope = TestScope(StandardTestDispatcher())
@@ -129,6 +140,139 @@ class DefaultTitleRepositoryTest {
 
         assertTrue(error is IOException)
     }
+
+    @Test
+    fun movieDetails_mapsAllFields() = testScope.runTest {
+        network.region = "BR"
+        network.details = mapOf(
+            1L to NetworkTitleDetails(
+                id = 1,
+                title = "Imperdoável",
+                posterPath = "/poster.jpg",
+                overview = "Após cumprir pena...",
+                voteAverage = 4.5,
+                voteCount = 120,
+                runtime = 113,
+                releaseDate = "2021-11-24",
+                genres = listOf(NetworkGenre("Drama"), NetworkGenre("Thriller")),
+                credits = NetworkCredits(listOf(NetworkCast("Sandra Bullock", "/sandra.jpg", order = 0))),
+                recommendations = NetworkPage(listOf(NetworkTitle(id = 2, name = "Lucifer", mediaType = "tv"))),
+                releaseDates = releaseDates("BR", NetworkReleaseDate("2021-12-10T00:00:00.000Z", type = 3)),
+            ),
+        )
+
+        val details = repository.getTitleDetails(1, MediaType.Movie)
+
+        assertEquals(
+            TitleDetails(
+                id = 1,
+                mediaType = MediaType.Movie,
+                name = "Imperdoável",
+                releaseDate = LocalDate.of(2021, 12, 10),
+                releaseCountry = "BR",
+                ratingPercent = 45,
+                runtimeMinutes = 113,
+                synopsis = "Após cumprir pena...",
+                artworkUrl = "https://image.tmdb.org/t/p/w780/poster.jpg",
+                cast = listOf(CastMember("Sandra Bullock", "https://image.tmdb.org/t/p/w185/sandra.jpg")),
+                genres = listOf("Drama", "Thriller"),
+                recommendations = listOf(Title(2, MediaType.Tv, "Lucifer", null)),
+            ),
+            details,
+        )
+    }
+
+    @Test
+    fun movieDetails_usesRegionalTheatricalRelease() = testScope.runTest {
+        network.region = "US"
+        network.details = mapOf(
+            1L to NetworkTitleDetails(
+                id = 1,
+                releaseDate = "2021-11-24",
+                releaseDates = releaseDates(
+                    "US",
+                    NetworkReleaseDate("2021-11-24T00:00:00.000Z", type = 4),
+                    NetworkReleaseDate("2021-11-26T00:00:00.000Z", type = 3),
+                ),
+            ),
+        )
+
+        val details = repository.getTitleDetails(1, MediaType.Movie)
+
+        assertEquals(LocalDate.of(2021, 11, 26), details.releaseDate)
+        assertEquals("US", details.releaseCountry)
+    }
+
+    @Test
+    fun movieDetails_withoutRegion_usesReleaseDateWithoutCountry() = testScope.runTest {
+        network.region = "BR"
+        network.details = mapOf(
+            1L to NetworkTitleDetails(
+                id = 1,
+                releaseDate = "2021-11-24",
+                releaseDates = releaseDates("US", NetworkReleaseDate("2021-11-26T00:00:00.000Z", type = 3)),
+            ),
+        )
+
+        val details = repository.getTitleDetails(1, MediaType.Movie)
+
+        assertEquals(LocalDate.of(2021, 11, 24), details.releaseDate)
+        assertEquals(null, details.releaseCountry)
+    }
+
+    @Test
+    fun tvDetails_usesFirstAirDateAndEpisodeRuntime() = testScope.runTest {
+        network.details = mapOf(
+            1L to NetworkTitleDetails(
+                id = 1,
+                name = "Lucifer",
+                firstAirDate = "2016-01-25",
+                originCountry = listOf("US"),
+                episodeRunTime = listOf(45),
+            ),
+        )
+
+        val details = repository.getTitleDetails(1, MediaType.Tv)
+
+        assertEquals("Lucifer", details.name)
+        assertEquals(LocalDate.of(2016, 1, 25), details.releaseDate)
+        assertEquals("US", details.releaseCountry)
+        assertEquals(45, details.runtimeMinutes)
+    }
+
+    @Test
+    fun details_missingFields_areNull() = testScope.runTest {
+        network.details = mapOf(
+            1L to NetworkTitleDetails(id = 1, title = "Unknown", overview = " ", runtime = 0, releaseDate = ""),
+        )
+
+        val details = repository.getTitleDetails(1, MediaType.Movie)
+
+        assertEquals(null, details.releaseDate)
+        assertEquals(null, details.releaseCountry)
+        assertEquals(null, details.ratingPercent)
+        assertEquals(null, details.runtimeMinutes)
+        assertEquals(null, details.synopsis)
+        assertEquals(null, details.artworkUrl)
+        assertTrue(details.cast.isEmpty() && details.genres.isEmpty() && details.recommendations.isEmpty())
+    }
+
+    @Test
+    fun details_castSortedAndLimitedToTen() = testScope.runTest {
+        network.details = mapOf(
+            1L to NetworkTitleDetails(
+                id = 1,
+                credits = NetworkCredits((12 downTo 1).map { NetworkCast("Actor $it", order = it) }),
+            ),
+        )
+
+        val cast = repository.getTitleDetails(1, MediaType.Movie).cast
+
+        assertEquals((1..10).map { "Actor $it" }, cast.map { it.name })
+    }
+
+    private fun releaseDates(country: String, vararg dates: NetworkReleaseDate) =
+        NetworkReleaseDates(listOf(NetworkCountryReleases(country, dates.toList())))
 
     private fun networkTitle(id: Long, popularity: Double = 0.0, voteAverage: Double = 0.0) =
         NetworkTitle(id = id, title = "Title $id", popularity = popularity, voteAverage = voteAverage)

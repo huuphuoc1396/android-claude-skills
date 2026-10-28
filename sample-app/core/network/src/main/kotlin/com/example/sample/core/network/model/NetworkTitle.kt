@@ -14,4 +14,6 @@ data class NetworkTitle(
     @SerializedName("poster_path") val posterPath: String? = null,
     @SerializedName("popularity") val popularity: Double = 0.0,
     @SerializedName("vote_average") val voteAverage: Double = 0.0,
+    /** `movie` or `tv`; only set in mixed lists such as recommendations. */
+    @SerializedName("media_type") val mediaType: String? = null,
 )

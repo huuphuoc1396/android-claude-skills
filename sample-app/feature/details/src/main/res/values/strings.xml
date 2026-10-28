@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_details_back">Back</string>
+    <string name="feature_details_cast">Main cast</string>
+    <string name="feature_details_genres">Genres</string>
+    <string name="feature_details_recommendations">Recommendations</string>
+    <string name="feature_details_error">Couldn\'t load</string>
+    <string name="feature_details_retry">Try again</string>
+</resources>

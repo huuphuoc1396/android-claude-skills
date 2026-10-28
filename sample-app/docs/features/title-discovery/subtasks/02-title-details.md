@@ -3,7 +3,7 @@
 Feature: [task.md](../task.md)
 Depends on: 01-home-browse
 Design: [show](../screens/show.md) (Content, No trailer is out of scope, Missing fields)
-Status: Todo
+Status: Done
 
 ## Goal
 Tapping any poster on Home opens Title details with artwork, name, year, release date, rating, runtime,

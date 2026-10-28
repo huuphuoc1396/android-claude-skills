@@ -14,4 +14,7 @@ object SampleColors {
     val SearchFill = Color(0xFF36076B)
     val SurfaceDeep = Color(0xFF15161D)
     val TextTertiary = Color(0xFFBBBBBB)
+
+    /** Where Title details' artwork fades into the page. */
+    val HeaderFade = Color(0xFF21222E)
 }

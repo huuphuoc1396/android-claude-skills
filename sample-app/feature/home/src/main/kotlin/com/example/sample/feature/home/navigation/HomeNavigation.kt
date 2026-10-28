@@ -2,14 +2,15 @@ package com.example.sample.feature.home.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.example.sample.core.data.model.Title
 import com.example.sample.feature.home.HomeRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
 data object HomeDestination
 
-fun NavGraphBuilder.homeScreen() {
+fun NavGraphBuilder.homeScreen(onTitleClick: (Title) -> Unit) {
     composable<HomeDestination> {
-        HomeRoute()
+        HomeRoute(onTitleClick = onTitleClick)
     }
 }

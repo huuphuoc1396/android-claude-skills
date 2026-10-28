@@ -57,12 +57,16 @@ private val HeaderHeight = 522.dp
 private const val DimmedAlpha = 0.6f
 
 @Composable
-internal fun HomeRoute(viewModel: HomeViewModel = hiltViewModel()) {
+internal fun HomeRoute(
+    onTitleClick: (Title) -> Unit,
+    viewModel: HomeViewModel = hiltViewModel(),
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     HomeScreen(
         uiState = uiState,
         onCategorySelected = viewModel::selectCategory,
         onRetry = viewModel::retry,
+        onTitleClick = onTitleClick,
     )
 }
 
@@ -71,6 +75,7 @@ internal fun HomeScreen(
     uiState: HomeUiState,
     onCategorySelected: (Category) -> Unit,
     onRetry: () -> Unit,
+    onTitleClick: (Title) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -96,7 +101,7 @@ internal fun HomeScreen(
                     modifier = Modifier.padding(top = 31.dp),
                 )
             }
-            content(uiState.content, onRetry)
+            content(uiState.content, onRetry, onTitleClick)
         }
     }
 }
@@ -191,7 +196,11 @@ private fun CategoryTabs(
     }
 }
 
-private fun LazyListScope.content(content: HomeContent, onRetry: () -> Unit) {
+private fun LazyListScope.content(
+    content: HomeContent,
+    onRetry: () -> Unit,
+    onTitleClick: (Title) -> Unit,
+) {
     when (content) {
         HomeContent.Loading -> item { SampleLoadingState(Modifier.height(240.dp)) }
         HomeContent.Error -> item {
@@ -204,7 +213,7 @@ private fun LazyListScope.content(content: HomeContent, onRetry: () -> Unit) {
         }
         is HomeContent.Success -> {
             if (content.featured.isNotEmpty()) {
-                item { PosterRow(content.featured, Modifier.padding(top = 37.dp)) }
+                item { PosterRow(content.featured, onTitleClick, Modifier.padding(top = 37.dp)) }
             }
             if (content.popular.isNotEmpty()) {
                 item {
@@ -215,21 +224,29 @@ private fun LazyListScope.content(content: HomeContent, onRetry: () -> Unit) {
                         modifier = Modifier.padding(start = SideMargin, end = SideMargin, top = 23.dp),
                     )
                 }
-                item { PosterRow(content.popular, Modifier.padding(top = 16.dp)) }
+                item { PosterRow(content.popular, onTitleClick, Modifier.padding(top = 16.dp)) }
             }
         }
     }
 }
 
 @Composable
-private fun PosterRow(titles: List<Title>, modifier: Modifier = Modifier) {
+private fun PosterRow(
+    titles: List<Title>,
+    onTitleClick: (Title) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     LazyRow(
         modifier = modifier,
         contentPadding = PaddingValues(horizontal = SideMargin),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(titles, key = { "${it.mediaType}-${it.id}" }) { title ->
-            SamplePoster(imageUrl = title.posterUrl, contentDescription = title.name)
+            SamplePoster(
+                imageUrl = title.posterUrl,
+                contentDescription = title.name,
+                onClick = { onTitleClick(title) },
+            )
         }
     }
 }
@@ -250,6 +267,7 @@ private fun HomeScreenPreview() {
             uiState = HomeUiState(Category.Films, HomeContent.Success(featured = titles, popular = titles)),
             onCategorySelected = {},
             onRetry = {},
+            onTitleClick = {},
         )
     }
 }

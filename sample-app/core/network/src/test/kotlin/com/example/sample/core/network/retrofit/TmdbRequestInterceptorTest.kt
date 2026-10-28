@@ -24,4 +24,14 @@ class TmdbRequestInterceptorTest {
     fun tmdbLanguage_otherLanguage_isEnUs() {
         assertEquals("en-US", tmdbLanguage(Locale.forLanguageTag("vi-VN")))
     }
+
+    @Test
+    fun tmdbRegion_portuguese_isBr() {
+        assertEquals("BR", tmdbRegion(Locale.forLanguageTag("pt-PT")))
+    }
+
+    @Test
+    fun tmdbRegion_other_isUs() {
+        assertEquals("US", tmdbRegion(Locale.forLanguageTag("en-GB")))
+    }
 }

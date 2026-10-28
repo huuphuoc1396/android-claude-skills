@@ -4,8 +4,11 @@ import com.example.sample.core.common.Dispatcher
 import com.example.sample.core.common.SampleDispatchers
 import com.example.sample.core.data.model.Category
 import com.example.sample.core.data.model.CategoryTitles
+import com.example.sample.core.data.model.MediaType
 import com.example.sample.core.data.model.Title
+import com.example.sample.core.data.model.TitleDetails
 import com.example.sample.core.data.model.asExternalModel
+import com.example.sample.core.data.model.asTmdbMediaType
 import com.example.sample.core.network.TmdbDiscoverQuery
 import com.example.sample.core.network.TmdbMediaType
 import com.example.sample.core.network.TmdbNetworkDataSource
@@ -35,6 +38,11 @@ internal class DefaultTitleRepository @Inject constructor(
         }
         val popular = async { fetch(rule, Section.Popular, minVoteCount = null) }
         CategoryTitles(featured = featured.await(), popular = popular.await())
+    }
+
+    override suspend fun getTitleDetails(id: Long, mediaType: MediaType): TitleDetails = withContext(ioDispatcher) {
+        val tmdbMediaType = mediaType.asTmdbMediaType()
+        network.getDetails(tmdbMediaType, id).asExternalModel(tmdbMediaType, network.region)
     }
 
     /** Queries every media type of [rule] and merges them, best first by the section's ranking. */
