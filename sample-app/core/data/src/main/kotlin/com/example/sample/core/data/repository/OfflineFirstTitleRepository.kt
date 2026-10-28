@@ -7,9 +7,13 @@ import com.example.sample.core.data.model.CategoryTitles
 import com.example.sample.core.data.model.MediaType
 import com.example.sample.core.data.model.Title
 import com.example.sample.core.data.model.TitleDetails
+import com.example.sample.core.data.model.asCategoryEntity
+import com.example.sample.core.data.model.asEntity
 import com.example.sample.core.data.model.asExternalModel
 import com.example.sample.core.data.model.asTmdbMediaType
 import com.example.sample.core.data.model.toTmdbMediaType
+import com.example.sample.core.database.dao.CategoryTitleDao
+import com.example.sample.core.database.dao.TitleDetailsDao
 import com.example.sample.core.network.TmdbDiscoverQuery
 import com.example.sample.core.network.TmdbMediaType
 import com.example.sample.core.network.TmdbNetworkDataSource
@@ -18,6 +22,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -26,19 +32,34 @@ private const val ANIMATION_GENRE = 16
 private const val SOAP_GENRE = 10766
 private const val LATIN_AMERICA = "BR|MX|CO|AR|CL|PE|VE"
 
-/** Network only for now; the database becomes the source of truth when caching is added. */
-internal class DefaultTitleRepository @Inject constructor(
+private const val FEATURED = "featured"
+private const val POPULAR = "popular"
+
+/** The database is the source of truth; the network only refreshes it. Search is network only. */
+internal class OfflineFirstTitleRepository @Inject constructor(
+    private val categoryTitleDao: CategoryTitleDao,
+    private val titleDetailsDao: TitleDetailsDao,
     private val network: TmdbNetworkDataSource,
     @Dispatcher(SampleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : TitleRepository {
 
-    override suspend fun getCategoryTitles(category: Category): CategoryTitles = withContext(ioDispatcher) {
+    override fun observeCategoryTitles(category: Category): Flow<CategoryTitles> =
+        categoryTitleDao.observe(category.name).map { rows ->
+            CategoryTitles(
+                featured = rows.filter { it.section == FEATURED }.map { it.asExternalModel() },
+                popular = rows.filter { it.section == POPULAR }.map { it.asExternalModel() },
+            )
+        }
+
+    override suspend fun refreshCategory(category: Category) = withContext(ioDispatcher) {
         val rule = category.rule()
         val featured = async {
             fetch(rule, Section.Featured, minVoteCount = rule.featuredMinVotes)
         }
         val popular = async { fetch(rule, Section.Popular, minVoteCount = null) }
-        CategoryTitles(featured = featured.await(), popular = popular.await())
+        val rows = featured.await().mapIndexed { position, title -> title.asCategoryEntity(category.name, FEATURED, position) } +
+            popular.await().mapIndexed { position, title -> title.asCategoryEntity(category.name, POPULAR, position) }
+        categoryTitleDao.replaceCategory(category.name, rows)
     }
 
     override suspend fun search(query: String): List<Title> = withContext(ioDispatcher) {
@@ -47,9 +68,13 @@ internal class DefaultTitleRepository @Inject constructor(
         }
     }
 
-    override suspend fun getTitleDetails(id: Long, mediaType: MediaType): TitleDetails = withContext(ioDispatcher) {
+    override fun observeTitleDetails(id: Long, mediaType: MediaType): Flow<TitleDetails?> =
+        titleDetailsDao.observe(id, mediaType.name).map { it?.asExternalModel() }
+
+    override suspend fun refreshTitleDetails(id: Long, mediaType: MediaType) = withContext(ioDispatcher) {
         val tmdbMediaType = mediaType.asTmdbMediaType()
-        network.getDetails(tmdbMediaType, id).asExternalModel(tmdbMediaType, network.region)
+        val details = network.getDetails(tmdbMediaType, id).asExternalModel(tmdbMediaType, network.region)
+        titleDetailsDao.upsert(details.asEntity())
     }
 
     /** Queries every media type of [rule] and merges them, best first by the section's ranking. */

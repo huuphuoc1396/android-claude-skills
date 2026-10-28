@@ -10,4 +10,7 @@
     <string name="feature_home_error">Não foi possível carregar</string>
     <string name="feature_home_retry">Tentar novamente</string>
     <string name="feature_home_profile">Perfil</string>
+    <string name="feature_home_empty">Nada por aqui ainda</string>
+    <string name="feature_home_offline">Você está offline</string>
+    <string name="feature_home_cached_notice">Você está offline. O conteúdo pode estar desatualizado.</string>
 </resources>

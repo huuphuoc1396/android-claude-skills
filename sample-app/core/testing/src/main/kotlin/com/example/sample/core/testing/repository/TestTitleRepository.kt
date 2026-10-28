@@ -6,25 +6,38 @@ import com.example.sample.core.data.model.MediaType
 import com.example.sample.core.data.model.Title
 import com.example.sample.core.data.model.TitleDetails
 import com.example.sample.core.data.repository.TitleRepository
-import java.io.IOException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 
-/** Test double for [TitleRepository]. Set [titles] per category and [details] per id; make calls fail with [shouldFail]. */
+/**
+ * Test double for [TitleRepository]. Push cached data with [sendCategoryTitles] and [sendTitleDetails]
+ * (like the real cache, a category starts empty and details start null); make refreshes throw with [refreshError].
+ */
 class TestTitleRepository : TitleRepository {
-    var titles: Map<Category, CategoryTitles> = emptyMap()
-    var details: Map<Long, TitleDetails> = emptyMap()
+    private val categoryTitles = MutableStateFlow(emptyMap<Category, CategoryTitles>())
+    private val titleDetails = MutableStateFlow<Map<Pair<Long, MediaType>, TitleDetails?>>(emptyMap())
+
     var searchResults: Map<String, List<Title>> = emptyMap()
 
     /** Thrown by [search] when set, e.g. an `IOException` for offline. */
     var searchError: Exception? = null
-    var shouldFail = false
 
-    private val _requestedCategories = mutableListOf<Category>()
-    val requestedCategories: List<Category> get() = _requestedCategories
+    /** Thrown by every refresh when set, e.g. an `IOException` for offline. */
+    var refreshError: Exception? = null
 
-    override suspend fun getCategoryTitles(category: Category): CategoryTitles {
-        _requestedCategories += category
-        if (shouldFail) throw IOException("Network error")
-        return titles[category] ?: CategoryTitles(featured = emptyList(), popular = emptyList())
+    private val _refreshedCategories = mutableListOf<Category>()
+    val refreshedCategories: List<Category> get() = _refreshedCategories
+
+    var detailsRefreshCount = 0
+        private set
+
+    override fun observeCategoryTitles(category: Category): Flow<CategoryTitles> =
+        categoryTitles.map { it[category] ?: CategoryTitles(featured = emptyList(), popular = emptyList()) }
+
+    override suspend fun refreshCategory(category: Category) {
+        _refreshedCategories += category
+        refreshError?.let { throw it }
     }
 
     override suspend fun search(query: String): List<Title> {
@@ -32,8 +45,19 @@ class TestTitleRepository : TitleRepository {
         return searchResults[query].orEmpty()
     }
 
-    override suspend fun getTitleDetails(id: Long, mediaType: MediaType): TitleDetails {
-        if (shouldFail) throw IOException("Network error")
-        return details.getValue(id)
+    override fun observeTitleDetails(id: Long, mediaType: MediaType): Flow<TitleDetails?> =
+        titleDetails.map { it[id to mediaType] }
+
+    override suspend fun refreshTitleDetails(id: Long, mediaType: MediaType) {
+        detailsRefreshCount++
+        refreshError?.let { throw it }
+    }
+
+    fun sendCategoryTitles(category: Category, titles: CategoryTitles) {
+        categoryTitles.value += category to titles
+    }
+
+    fun sendTitleDetails(details: TitleDetails) {
+        titleDetails.value += (details.id to details.mediaType) to details
     }
 }

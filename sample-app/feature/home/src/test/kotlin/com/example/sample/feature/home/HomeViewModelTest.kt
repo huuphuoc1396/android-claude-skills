@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import java.io.IOException
 
 class HomeViewModelTest {
     @get:Rule
@@ -19,30 +20,90 @@ class HomeViewModelTest {
 
     private val repository = TestTitleRepository()
 
+    private fun viewModel(savedStateHandle: SavedStateHandle = SavedStateHandle()) =
+        HomeViewModel(savedStateHandle, repository)
+
     @Test
     fun initialState_isFilmsLoading() {
-        val viewModel = HomeViewModel(SavedStateHandle(), repository)
-
-        assertEquals(HomeUiState(Category.Films, HomeContent.Loading), viewModel.uiState.value)
+        assertEquals(HomeUiState(Category.Films, HomeContent.Loading), viewModel().uiState.value)
     }
 
     @Test
-    fun load_success_showsFeaturedAndPopular() = runTest {
-        repository.titles = mapOf(Category.Films to CategoryTitles(featured = listOf(film), popular = listOf(series)))
-        val viewModel = HomeViewModel(SavedStateHandle(), repository)
+    fun cachedContent_shownWhileRefreshing() = runTest {
+        repository.sendCategoryTitles(Category.Films, CategoryTitles(featured = listOf(film), popular = listOf(series)))
+        val viewModel = viewModel()
 
         viewModel.uiState.test {
             assertEquals(
                 HomeUiState(Category.Films, HomeContent.Success(featured = listOf(film), popular = listOf(series))),
                 expectMostRecentItem(),
             )
+            assertEquals(listOf(Category.Films), repository.refreshedCategories)
         }
     }
 
     @Test
-    fun selectCategory_loadsThatCategory() = runTest {
-        repository.titles = mapOf(Category.Anime to CategoryTitles(featured = listOf(film), popular = emptyList()))
-        val viewModel = HomeViewModel(SavedStateHandle(), repository)
+    fun refreshOffline_withCache_showsNotice() = runTest {
+        repository.refreshError = IOException("offline")
+        repository.sendCategoryTitles(Category.Films, CategoryTitles(featured = listOf(film), popular = emptyList()))
+
+        viewModel().uiState.test {
+            assertEquals(
+                HomeContent.Success(featured = listOf(film), popular = emptyList(), offlineNotice = true),
+                expectMostRecentItem().content,
+            )
+        }
+    }
+
+    @Test
+    fun refreshFailed_withCache_flagsRefreshFailed() = runTest {
+        repository.refreshError = IllegalStateException("server")
+        repository.sendCategoryTitles(Category.Films, CategoryTitles(featured = listOf(film), popular = emptyList()))
+
+        viewModel().uiState.test {
+            assertEquals(
+                HomeContent.Success(featured = listOf(film), popular = emptyList(), refreshFailed = true),
+                expectMostRecentItem().content,
+            )
+        }
+    }
+
+    @Test
+    fun emptyAfterRefresh_showsEmpty() = runTest {
+        viewModel().uiState.test {
+            assertEquals(HomeContent.Empty, expectMostRecentItem().content)
+        }
+    }
+
+    @Test
+    fun offline_withoutCache_showsOfflineError() = runTest {
+        repository.refreshError = IOException("offline")
+
+        viewModel().uiState.test {
+            assertEquals(HomeContent.Error(offline = true), expectMostRecentItem().content)
+        }
+    }
+
+    @Test
+    fun retry_afterError_recovers() = runTest {
+        repository.refreshError = IllegalStateException("server")
+        val viewModel = viewModel()
+
+        viewModel.uiState.test {
+            assertEquals(HomeContent.Error(offline = false), expectMostRecentItem().content)
+            repository.refreshError = null
+            repository.sendCategoryTitles(Category.Films, CategoryTitles(featured = listOf(film), popular = emptyList()))
+            viewModel.retry()
+
+            assertEquals(HomeContent.Success(featured = listOf(film), popular = emptyList()), expectMostRecentItem().content)
+            assertEquals(2, repository.refreshedCategories.size)
+        }
+    }
+
+    @Test
+    fun selectCategory_refreshesThatCategory() = runTest {
+        repository.sendCategoryTitles(Category.Anime, CategoryTitles(featured = listOf(film), popular = emptyList()))
+        val viewModel = viewModel()
 
         viewModel.uiState.test {
             viewModel.selectCategory(Category.Anime)
@@ -51,38 +112,13 @@ class HomeViewModelTest {
                 HomeUiState(Category.Anime, HomeContent.Success(featured = listOf(film), popular = emptyList())),
                 expectMostRecentItem(),
             )
-            assertEquals(listOf(Category.Films, Category.Anime), repository.requestedCategories)
-        }
-    }
-
-    @Test
-    fun load_failure_showsError() = runTest {
-        repository.shouldFail = true
-        val viewModel = HomeViewModel(SavedStateHandle(), repository)
-
-        viewModel.uiState.test {
-            assertEquals(HomeUiState(Category.Films, HomeContent.Error), expectMostRecentItem())
-        }
-    }
-
-    @Test
-    fun retry_afterError_recovers() = runTest {
-        repository.shouldFail = true
-        val viewModel = HomeViewModel(SavedStateHandle(), repository)
-
-        viewModel.uiState.test {
-            assertEquals(HomeContent.Error, expectMostRecentItem().content)
-            repository.shouldFail = false
-            viewModel.retry()
-
-            assertEquals(HomeContent.Success(featured = emptyList(), popular = emptyList()), expectMostRecentItem().content)
-            assertEquals(2, repository.requestedCategories.size)
+            assertEquals(listOf(Category.Films, Category.Anime), repository.refreshedCategories)
         }
     }
 
     @Test
     fun onQueryChange_updatesQuery() {
-        val viewModel = HomeViewModel(SavedStateHandle(), repository)
+        val viewModel = viewModel()
 
         viewModel.onQueryChange("matrix")
 
@@ -91,7 +127,7 @@ class HomeViewModelTest {
 
     @Test
     fun query_restoredFromSavedState() {
-        val viewModel = HomeViewModel(SavedStateHandle(mapOf("query" to "lucifer")), repository)
+        val viewModel = viewModel(SavedStateHandle(mapOf("query" to "lucifer")))
 
         assertEquals("lucifer", viewModel.query.value)
     }

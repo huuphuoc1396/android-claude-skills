@@ -10,4 +10,7 @@
     <string name="feature_details_trailer_error">Couldn\'t open the trailer</string>
     <string name="feature_details_favorite_add">Add to favorites</string>
     <string name="feature_details_favorite_remove">Remove from favorites</string>
+    <string name="feature_details_offline">You\'re offline</string>
+    <string name="feature_details_cached_notice">You\'re offline. Content may be out of date.</string>
+    <string name="feature_details_refresh_failed">Couldn\'t refresh</string>
 </resources>

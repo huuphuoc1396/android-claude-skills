@@ -8,19 +8,15 @@ import com.example.sample.core.data.repository.FavoritesRepository
 import com.example.sample.core.data.repository.TitleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.IOException
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class DetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -32,38 +28,56 @@ class DetailsViewModel @Inject constructor(
     private val id: Long = checkNotNull(savedStateHandle["id"])
     private val mediaType: MediaType = MediaType.valueOf(checkNotNull(savedStateHandle["mediaType"]))
 
-    private val retryCount = MutableStateFlow(0)
+    private val refreshState = MutableStateFlow(RefreshState.Loading)
 
-    private val loadState = retryCount.flatMapLatest {
-        flow {
-            emit(DetailsUiState.Loading)
-            emit(load())
+    /** The cached details, the favorite flag, and how the latest refresh went (AC-11). */
+    val uiState: StateFlow<DetailsUiState> = combine(
+        titleRepository.observeTitleDetails(id, mediaType),
+        favoritesRepository.observeIsFavorite(id, mediaType),
+        refreshState,
+    ) { details, isFavorite, refresh ->
+        when {
+            details != null -> DetailsUiState.Success(
+                details = details,
+                isFavorite = isFavorite,
+                offlineNotice = refresh == RefreshState.Offline,
+                refreshFailed = refresh == RefreshState.Failed,
+            )
+            refresh == RefreshState.Loading || refresh == RefreshState.Done -> DetailsUiState.Loading
+            else -> DetailsUiState.Error(offline = refresh == RefreshState.Offline)
         }
-    }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = DetailsUiState.Loading,
+    )
 
-    val uiState: StateFlow<DetailsUiState> =
-        combine(loadState, favoritesRepository.observeIsFavorite(id, mediaType)) { state, isFavorite ->
-            if (state is DetailsUiState.Success) state.copy(isFavorite = isFavorite) else state
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = DetailsUiState.Loading,
-        )
+    init {
+        refresh()
+    }
 
     /** Saves [favorite] as the new state; the screen sends the opposite of what it shows. */
     fun setFavorite(favorite: Boolean) {
         viewModelScope.launch { favoritesRepository.setFavorite(id, mediaType, favorite) }
     }
 
-    fun retry() {
-        retryCount.update { it + 1 }
+    fun retry() = refresh()
+
+    private fun refresh() {
+        viewModelScope.launch {
+            refreshState.value = RefreshState.Loading
+            refreshState.value = try {
+                titleRepository.refreshTitleDetails(id, mediaType)
+                RefreshState.Done
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                RefreshState.Offline
+            } catch (e: Exception) {
+                RefreshState.Failed
+            }
+        }
     }
 
-    private suspend fun load(): DetailsUiState = try {
-        DetailsUiState.Success(titleRepository.getTitleDetails(id, mediaType), isFavorite = false)
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        DetailsUiState.Error
-    }
+    private enum class RefreshState { Loading, Done, Offline, Failed }
 }

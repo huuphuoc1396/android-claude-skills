@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import java.io.IOException
 
 class DetailsViewModelTest {
     @get:Rule
@@ -20,35 +21,56 @@ class DetailsViewModelTest {
     private val favorites = TestFavoritesRepository()
     private val savedStateHandle = SavedStateHandle(mapOf("id" to 7L, "mediaType" to "Tv"))
 
-    @Test
-    fun load_readsRouteAndShowsDetails() = runTest {
-        repository.details = mapOf(7L to details)
-        val viewModel = DetailsViewModel(savedStateHandle, repository, favorites)
+    private fun viewModel() = DetailsViewModel(savedStateHandle, repository, favorites)
 
-        viewModel.uiState.test {
+    @Test
+    fun cachedDetails_shownWhileRefreshing() = runTest {
+        repository.sendTitleDetails(details)
+
+        viewModel().uiState.test {
             assertEquals(DetailsUiState.Success(details, isFavorite = false), expectMostRecentItem())
+            assertEquals(1, repository.detailsRefreshCount)
         }
     }
 
     @Test
-    fun load_failure_showsError() = runTest {
-        repository.shouldFail = true
-        val viewModel = DetailsViewModel(savedStateHandle, repository, favorites)
+    fun offline_withoutCache_showsOfflineError() = runTest {
+        repository.refreshError = IOException("offline")
 
-        viewModel.uiState.test {
-            assertEquals(DetailsUiState.Error, expectMostRecentItem())
+        viewModel().uiState.test {
+            assertEquals(DetailsUiState.Error(offline = true), expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun refreshOffline_withCache_showsNotice() = runTest {
+        repository.refreshError = IOException("offline")
+        repository.sendTitleDetails(details)
+
+        viewModel().uiState.test {
+            assertEquals(DetailsUiState.Success(details, isFavorite = false, offlineNotice = true), expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun refreshFailed_withCache_flagsRefreshFailed() = runTest {
+        repository.refreshError = IllegalStateException("server")
+        repository.sendTitleDetails(details)
+
+        viewModel().uiState.test {
+            assertEquals(DetailsUiState.Success(details, isFavorite = false, refreshFailed = true), expectMostRecentItem())
         }
     }
 
     @Test
     fun retry_afterError_recovers() = runTest {
-        repository.shouldFail = true
-        repository.details = mapOf(7L to details)
-        val viewModel = DetailsViewModel(savedStateHandle, repository, favorites)
+        repository.refreshError = IllegalStateException("server")
+        val viewModel = viewModel()
 
         viewModel.uiState.test {
-            assertEquals(DetailsUiState.Error, expectMostRecentItem())
-            repository.shouldFail = false
+            assertEquals(DetailsUiState.Error(offline = false), expectMostRecentItem())
+            repository.refreshError = null
+            repository.sendTitleDetails(details)
             viewModel.retry()
 
             assertEquals(DetailsUiState.Success(details, isFavorite = false), expectMostRecentItem())
@@ -57,19 +79,18 @@ class DetailsViewModelTest {
 
     @Test
     fun success_includesFavoriteState() = runTest {
-        repository.details = mapOf(7L to details)
+        repository.sendTitleDetails(details)
         favorites.setFavorite(7, MediaType.Tv, favorite = true)
-        val viewModel = DetailsViewModel(savedStateHandle, repository, favorites)
 
-        viewModel.uiState.test {
+        viewModel().uiState.test {
             assertEquals(DetailsUiState.Success(details, isFavorite = true), expectMostRecentItem())
         }
     }
 
     @Test
     fun setFavorite_updatesState() = runTest {
-        repository.details = mapOf(7L to details)
-        val viewModel = DetailsViewModel(savedStateHandle, repository, favorites)
+        repository.sendTitleDetails(details)
+        val viewModel = viewModel()
 
         viewModel.uiState.test {
             viewModel.setFavorite(true)
@@ -80,8 +101,8 @@ class DetailsViewModelTest {
 
     @Test
     fun setFavorite_repeated_lastWins() = runTest {
-        repository.details = mapOf(7L to details)
-        val viewModel = DetailsViewModel(savedStateHandle, repository, favorites)
+        repository.sendTitleDetails(details)
+        val viewModel = viewModel()
 
         viewModel.uiState.test {
             listOf(true, false, true, false).forEach(viewModel::setFavorite)

@@ -5,6 +5,8 @@ import com.example.sample.core.data.model.Category
 import com.example.sample.core.data.model.MediaType
 import com.example.sample.core.data.model.Title
 import com.example.sample.core.data.model.TitleDetails
+import com.example.sample.core.data.testdoubles.FakeCategoryTitleDao
+import com.example.sample.core.data.testdoubles.FakeTitleDetailsDao
 import com.example.sample.core.data.testdoubles.FakeTmdbNetworkDataSource
 import com.example.sample.core.network.TmdbDiscoverQuery
 import com.example.sample.core.network.TmdbMediaType
@@ -19,6 +21,7 @@ import com.example.sample.core.network.model.NetworkTitle
 import com.example.sample.core.network.model.NetworkTitleDetails
 import com.example.sample.core.network.model.NetworkVideo
 import com.example.sample.core.network.model.NetworkVideos
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -29,15 +32,17 @@ import org.junit.Test
 import java.io.IOException
 import java.time.LocalDate
 
-class DefaultTitleRepositoryTest {
+class OfflineFirstTitleRepositoryTest {
     private val testScope = TestScope(StandardTestDispatcher())
     private lateinit var network: FakeTmdbNetworkDataSource
-    private lateinit var repository: DefaultTitleRepository
+    private lateinit var repository: OfflineFirstTitleRepository
 
     @Before
     fun setUp() {
         network = FakeTmdbNetworkDataSource()
-        repository = DefaultTitleRepository(
+        repository = OfflineFirstTitleRepository(
+            categoryTitleDao = FakeCategoryTitleDao(),
+            titleDetailsDao = FakeTitleDetailsDao(),
             network = network,
             ioDispatcher = StandardTestDispatcher(testScope.testScheduler),
         )
@@ -45,7 +50,7 @@ class DefaultTitleRepositoryTest {
 
     @Test
     fun films_queriesMoviesWithoutFilters() = testScope.runTest {
-        repository.getCategoryTitles(Category.Films)
+        getCategoryTitles(Category.Films)
 
         assertEquals(
             setOf(
@@ -58,7 +63,7 @@ class DefaultTitleRepositoryTest {
 
     @Test
     fun series_queriesTvWithoutFilters() = testScope.runTest {
-        repository.getCategoryTitles(Category.Series)
+        getCategoryTitles(Category.Series)
 
         assertEquals(
             setOf(
@@ -71,7 +76,7 @@ class DefaultTitleRepositoryTest {
 
     @Test
     fun anime_queriesMovieAndTvAnimationFromJapan() = testScope.runTest {
-        repository.getCategoryTitles(Category.Anime)
+        getCategoryTitles(Category.Anime)
 
         assertEquals(4, network.queries.size)
         assertEquals(setOf(TmdbMediaType.Movie, TmdbMediaType.Tv), network.queries.map { it.mediaType }.toSet())
@@ -85,7 +90,7 @@ class DefaultTitleRepositoryTest {
             TmdbMediaType.Tv to listOf(networkTitle(id = 2, popularity = 30.0), networkTitle(id = 3, popularity = 20.0)),
         )
 
-        val popular = repository.getCategoryTitles(Category.Anime).popular
+        val popular = getCategoryTitles(Category.Anime).popular
 
         assertEquals(listOf(2L, 3L, 1L), popular.map { it.id })
         assertEquals(listOf(MediaType.Tv, MediaType.Tv, MediaType.Movie), popular.map { it.mediaType })
@@ -93,7 +98,7 @@ class DefaultTitleRepositoryTest {
 
     @Test
     fun novelas_queriesSoapTvFromLatinAmerica() = testScope.runTest {
-        repository.getCategoryTitles(Category.Novelas)
+        getCategoryTitles(Category.Novelas)
 
         assertTrue(network.queries.all { it.mediaType == TmdbMediaType.Tv })
         assertTrue(network.queries.all { it.genreId == 10766 && it.originCountries == "BR|MX|CO|AR|CL|PE|VE" })
@@ -108,7 +113,7 @@ class DefaultTitleRepositoryTest {
             ),
         )
 
-        val featured = repository.getCategoryTitles(Category.Films).featured
+        val featured = getCategoryTitles(Category.Films).featured
 
         assertEquals(listOf(2L, 1L), featured.map { it.id })
         assertEquals(1000, network.queries.single { it.sortBy == "vote_average.desc" }.minVoteCount)
@@ -123,7 +128,7 @@ class DefaultTitleRepositoryTest {
             ),
         )
 
-        val popular = repository.getCategoryTitles(Category.Series).popular
+        val popular = getCategoryTitles(Category.Series).popular
 
         assertEquals(
             listOf(
@@ -138,7 +143,7 @@ class DefaultTitleRepositoryTest {
     fun networkError_isThrown() = testScope.runTest {
         network.shouldFail = true
 
-        val error = runCatching { repository.getCategoryTitles(Category.Films) }.exceptionOrNull()
+        val error = runCatching { getCategoryTitles(Category.Films) }.exceptionOrNull()
 
         assertTrue(error is IOException)
     }
@@ -163,7 +168,7 @@ class DefaultTitleRepositoryTest {
             ),
         )
 
-        val details = repository.getTitleDetails(1, MediaType.Movie)
+        val details = getTitleDetails(1, MediaType.Movie)
 
         assertEquals(
             TitleDetails(
@@ -200,7 +205,7 @@ class DefaultTitleRepositoryTest {
             ),
         )
 
-        val details = repository.getTitleDetails(1, MediaType.Movie)
+        val details = getTitleDetails(1, MediaType.Movie)
 
         assertEquals(LocalDate.of(2021, 11, 26), details.releaseDate)
         assertEquals("US", details.releaseCountry)
@@ -217,7 +222,7 @@ class DefaultTitleRepositoryTest {
             ),
         )
 
-        val details = repository.getTitleDetails(1, MediaType.Movie)
+        val details = getTitleDetails(1, MediaType.Movie)
 
         assertEquals(LocalDate.of(2021, 11, 24), details.releaseDate)
         assertEquals(null, details.releaseCountry)
@@ -235,7 +240,7 @@ class DefaultTitleRepositoryTest {
             ),
         )
 
-        val details = repository.getTitleDetails(1, MediaType.Tv)
+        val details = getTitleDetails(1, MediaType.Tv)
 
         assertEquals("Lucifer", details.name)
         assertEquals(LocalDate.of(2016, 1, 25), details.releaseDate)
@@ -249,7 +254,7 @@ class DefaultTitleRepositoryTest {
             1L to NetworkTitleDetails(id = 1, title = "Unknown", overview = " ", runtime = 0, releaseDate = ""),
         )
 
-        val details = repository.getTitleDetails(1, MediaType.Movie)
+        val details = getTitleDetails(1, MediaType.Movie)
 
         assertEquals(null, details.releaseDate)
         assertEquals(null, details.releaseCountry)
@@ -269,7 +274,7 @@ class DefaultTitleRepositoryTest {
             ),
         )
 
-        val cast = repository.getTitleDetails(1, MediaType.Movie).cast
+        val cast = getTitleDetails(1, MediaType.Movie).cast
 
         assertEquals((1..10).map { "Actor $it" }, cast.map { it.name })
     }
@@ -290,7 +295,7 @@ class DefaultTitleRepositoryTest {
             ),
         )
 
-        val trailerUrl = repository.getTitleDetails(1, MediaType.Movie).trailerUrl
+        val trailerUrl = getTitleDetails(1, MediaType.Movie).trailerUrl
 
         assertEquals("https://www.youtube.com/watch?v=official", trailerUrl)
     }
@@ -304,7 +309,7 @@ class DefaultTitleRepositoryTest {
             ),
         )
 
-        assertEquals(null, repository.getTitleDetails(1, MediaType.Movie).trailerUrl)
+        assertEquals(null, getTitleDetails(1, MediaType.Movie).trailerUrl)
     }
 
     @Test
@@ -329,6 +334,41 @@ class DefaultTitleRepositoryTest {
 
         assertEquals(listOf("lucifer"), network.searchQueries)
     }
+
+    @Test
+    fun refreshCategory_replacesOldRows() = testScope.runTest {
+        network.results = mapOf(TmdbMediaType.Movie to listOf(networkTitle(id = 1), networkTitle(id = 2)))
+        repository.refreshCategory(Category.Films)
+        network.results = mapOf(TmdbMediaType.Movie to listOf(networkTitle(id = 3)))
+
+        repository.refreshCategory(Category.Films)
+
+        assertEquals(listOf(3L), repository.observeCategoryTitles(Category.Films).first().popular.map { it.id })
+    }
+
+    @Test
+    fun observeTitleDetails_beforeRefresh_isNull() = testScope.runTest {
+        assertEquals(null, repository.observeTitleDetails(1, MediaType.Movie).first())
+    }
+
+    @Test
+    fun refresh_whenNetworkFails_throwsAndKeepsCache() = testScope.runTest {
+        network.results = mapOf(TmdbMediaType.Movie to listOf(networkTitle(id = 1)))
+        repository.refreshCategory(Category.Films)
+        network.shouldFail = true
+
+        val error = runCatching { repository.refreshCategory(Category.Films) }.exceptionOrNull()
+
+        assertTrue(error is IOException)
+        assertEquals(listOf(1L), repository.observeCategoryTitles(Category.Films).first().popular.map { it.id })
+    }
+
+    /** Refresh, then read back what was cached: the path every screen takes. */
+    private suspend fun getCategoryTitles(category: Category) =
+        repository.refreshCategory(category).let { repository.observeCategoryTitles(category).first() }
+
+    private suspend fun getTitleDetails(id: Long, mediaType: MediaType) =
+        repository.refreshTitleDetails(id, mediaType).let { checkNotNull(repository.observeTitleDetails(id, mediaType).first()) }
 
     private fun releaseDates(country: String, vararg dates: NetworkReleaseDate) =
         NetworkReleaseDates(listOf(NetworkCountryReleases(country, dates.toList())))

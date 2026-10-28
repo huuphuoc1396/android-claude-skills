@@ -32,6 +32,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -108,6 +109,11 @@ internal fun DetailsScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val trailerError = stringResource(R.string.feature_details_trailer_error)
+    val refreshFailed = (uiState as? DetailsUiState.Success)?.refreshFailed == true
+    val refreshFailedMessage = stringResource(R.string.feature_details_refresh_failed)
+    LaunchedEffect(refreshFailed) {
+        if (refreshFailed) snackbarHostState.showSnackbar(refreshFailedMessage)
+    }
     val openTrailer: (String) -> Unit = { url ->
         try {
             context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
@@ -122,12 +128,14 @@ internal fun DetailsScreen(
     ) {
         when (uiState) {
             DetailsUiState.Loading -> SampleLoadingState()
-            DetailsUiState.Error -> SampleErrorState(
-                message = stringResource(R.string.feature_details_error),
+            is DetailsUiState.Error -> SampleErrorState(
+                message = stringResource(
+                    if (uiState.offline) R.string.feature_details_offline else R.string.feature_details_error,
+                ),
                 onRetry = onRetry,
                 retryLabel = stringResource(R.string.feature_details_retry),
             )
-            is DetailsUiState.Success -> DetailsContent(uiState.details, onTitleClick, openTrailer)
+            is DetailsUiState.Success -> DetailsContent(uiState.details, uiState.offlineNotice, onTitleClick, openTrailer)
         }
         BackButton(onBack)
         if (uiState is DetailsUiState.Success) {
@@ -201,6 +209,7 @@ private fun BackButton(onBack: () -> Unit) {
 @Composable
 private fun DetailsContent(
     details: TitleDetails,
+    offlineNotice: Boolean,
     onTitleClick: (Title) -> Unit,
     onTrailerClick: (String) -> Unit,
 ) {
@@ -234,6 +243,14 @@ private fun DetailsContent(
                 color = Color.Black,
                 modifier = Modifier.padding(start = SideMargin, end = SideMargin, top = 20.dp),
             )
+            if (offlineNotice) {
+                Text(
+                    text = stringResource(R.string.feature_details_cached_notice),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = SampleColors.TextTertiary,
+                    modifier = Modifier.padding(start = SideMargin, end = SideMargin, top = 16.dp),
+                )
+            }
             details.synopsis?.let { synopsis ->
                 Text(
                     text = synopsis,

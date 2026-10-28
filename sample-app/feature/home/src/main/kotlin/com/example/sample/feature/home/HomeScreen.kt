@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -25,9 +26,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,10 +48,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.sample.core.data.model.Category
 import com.example.sample.core.data.model.MediaType
 import com.example.sample.core.data.model.Title
+import com.example.sample.core.designsystem.component.SampleEmptyState
 import com.example.sample.core.designsystem.component.SampleErrorState
 import com.example.sample.core.designsystem.component.SampleLoadingState
 import com.example.sample.core.designsystem.component.SamplePoster
 import com.example.sample.core.designsystem.component.SampleSearchField
+import com.example.sample.core.designsystem.theme.SampleColors
 import com.example.sample.core.designsystem.theme.SampleGradients
 import com.example.sample.core.designsystem.theme.SampleTheme
 
@@ -86,6 +93,12 @@ internal fun HomeScreen(
     onTitleClick: (Title) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val refreshFailed = (uiState.content as? HomeContent.Success)?.refreshFailed == true
+    val refreshFailedMessage = stringResource(R.string.feature_home_error)
+    LaunchedEffect(refreshFailed) {
+        if (refreshFailed) snackbarHostState.showSnackbar(refreshFailedMessage)
+    }
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -111,6 +124,12 @@ internal fun HomeScreen(
             }
             content(uiState.content, onRetry, onTitleClick)
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding(),
+        )
     }
 }
 
@@ -195,15 +214,28 @@ private fun LazyListScope.content(
 ) {
     when (content) {
         HomeContent.Loading -> item { SampleLoadingState(Modifier.height(240.dp)) }
-        HomeContent.Error -> item {
+        HomeContent.Empty -> item {
+            SampleEmptyState(stringResource(R.string.feature_home_empty), Modifier.height(240.dp))
+        }
+        is HomeContent.Error -> item {
             SampleErrorState(
-                message = stringResource(R.string.feature_home_error),
+                message = stringResource(if (content.offline) R.string.feature_home_offline else R.string.feature_home_error),
                 onRetry = onRetry,
                 retryLabel = stringResource(R.string.feature_home_retry),
                 modifier = Modifier.height(240.dp),
             )
         }
         is HomeContent.Success -> {
+            if (content.offlineNotice) {
+                item {
+                    Text(
+                        text = stringResource(R.string.feature_home_cached_notice),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = SampleColors.TextTertiary,
+                        modifier = Modifier.padding(start = SideMargin, end = SideMargin, top = 16.dp),
+                    )
+                }
+            }
             if (content.featured.isNotEmpty()) {
                 item { PosterRow(content.featured, onTitleClick, Modifier.padding(top = 37.dp)) }
             }

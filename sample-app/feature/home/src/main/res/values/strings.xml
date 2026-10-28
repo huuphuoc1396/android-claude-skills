@@ -10,4 +10,7 @@
     <string name="feature_home_error">Couldn\'t load</string>
     <string name="feature_home_retry">Try again</string>
     <string name="feature_home_profile">Profile</string>
+    <string name="feature_home_empty">Nothing here yet</string>
+    <string name="feature_home_offline">You\'re offline</string>
+    <string name="feature_home_cached_notice">You\'re offline. Content may be out of date.</string>
 </resources>

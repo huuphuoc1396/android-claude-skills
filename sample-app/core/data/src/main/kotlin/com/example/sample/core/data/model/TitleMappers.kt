@@ -1,5 +1,9 @@
 package com.example.sample.core.data.model
 
+import com.example.sample.core.database.model.CachedCastMember
+import com.example.sample.core.database.model.CachedTitle
+import com.example.sample.core.database.model.CategoryTitleEntity
+import com.example.sample.core.database.model.TitleDetailsEntity
 import com.example.sample.core.network.TmdbMediaType
 import com.example.sample.core.network.model.NetworkTitle
 import com.example.sample.core.network.model.NetworkTitleDetails
@@ -70,6 +74,59 @@ private fun TmdbMediaType.asExternalModel() = when (this) {
     TmdbMediaType.Movie -> MediaType.Movie
     TmdbMediaType.Tv -> MediaType.Tv
 }
+
+internal fun Title.asCategoryEntity(category: String, section: String, position: Int) = CategoryTitleEntity(
+    category = category,
+    section = section,
+    position = position,
+    id = id,
+    mediaType = mediaType.name,
+    name = name,
+    posterUrl = posterUrl,
+)
+
+internal fun CategoryTitleEntity.asExternalModel() = Title(
+    id = id,
+    mediaType = MediaType.valueOf(mediaType),
+    name = name,
+    posterUrl = posterUrl,
+)
+
+internal fun TitleDetails.asEntity() = TitleDetailsEntity(
+    id = id,
+    mediaType = mediaType.name,
+    name = name,
+    releaseDate = releaseDate?.toString(),
+    releaseCountry = releaseCountry,
+    ratingPercent = ratingPercent,
+    runtimeMinutes = runtimeMinutes,
+    synopsis = synopsis,
+    artworkUrl = artworkUrl,
+    trailerUrl = trailerUrl,
+    cast = cast.map { CachedCastMember(name = it.name, photoUrl = it.photoUrl) },
+    genres = genres,
+    recommendations = recommendations.map {
+        CachedTitle(id = it.id, mediaType = it.mediaType.name, name = it.name, posterUrl = it.posterUrl)
+    },
+)
+
+internal fun TitleDetailsEntity.asExternalModel() = TitleDetails(
+    id = id,
+    mediaType = MediaType.valueOf(mediaType),
+    name = name,
+    releaseDate = releaseDate?.let(LocalDate::parse),
+    releaseCountry = releaseCountry,
+    ratingPercent = ratingPercent,
+    runtimeMinutes = runtimeMinutes,
+    synopsis = synopsis,
+    artworkUrl = artworkUrl,
+    cast = cast.map { CastMember(name = it.name, photoUrl = it.photoUrl) },
+    genres = genres,
+    recommendations = recommendations.map {
+        Title(id = it.id, mediaType = MediaType.valueOf(it.mediaType), name = it.name, posterUrl = it.posterUrl)
+    },
+    trailerUrl = trailerUrl,
+)
 
 internal fun MediaType.asTmdbMediaType() = when (this) {
     MediaType.Movie -> TmdbMediaType.Movie

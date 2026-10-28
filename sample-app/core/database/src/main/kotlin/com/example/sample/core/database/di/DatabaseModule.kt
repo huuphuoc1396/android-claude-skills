@@ -3,8 +3,9 @@ package com.example.sample.core.database.di
 import android.content.Context
 import androidx.room.Room
 import com.example.sample.core.database.SampleDatabase
-import com.example.sample.core.database.dao.ArticleDao
+import com.example.sample.core.database.dao.CategoryTitleDao
 import com.example.sample.core.database.dao.FavoriteDao
+import com.example.sample.core.database.dao.TitleDetailsDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,8 +22,11 @@ internal object DatabaseModule {
         Room.databaseBuilder(context, SampleDatabase::class.java, "sample-database").build()
 
     @Provides
-    fun providesArticleDao(database: SampleDatabase): ArticleDao = database.articleDao()
+    fun providesFavoriteDao(database: SampleDatabase): FavoriteDao = database.favoriteDao()
 
     @Provides
-    fun providesFavoriteDao(database: SampleDatabase): FavoriteDao = database.favoriteDao()
+    fun providesCategoryTitleDao(database: SampleDatabase): CategoryTitleDao = database.categoryTitleDao()
+
+    @Provides
+    fun providesTitleDetailsDao(database: SampleDatabase): TitleDetailsDao = database.titleDetailsDao()
 }

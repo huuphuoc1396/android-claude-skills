@@ -3,7 +3,7 @@
 Feature: [task.md](../task.md)
 Depends on: 02-title-details
 Design: [home](../screens/home.md) (Loading, Empty, Error, Cached notice, Refresh failed), [show](../screens/show.md) (Loading, Error, Cached notice)
-Status: Todo
+Status: Done
 
 ## Goal
 Home lists and opened Title details are stored on the device, shown instantly on the next visit, and
