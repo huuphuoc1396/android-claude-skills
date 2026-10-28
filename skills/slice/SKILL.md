@@ -1,9 +1,9 @@
 ---
-name: breakdown
-description: Split a large task.md into ordered, reviewable vertical-slice subtasks under docs/features/<feature>/subtasks/. Use when a feature spans several screens or layers or is too big for one reviewable diff; skip it when the task fits one implement plan.
+name: slice
+description: Split a large task.md into ordered, reviewable vertical-slice subtasks under docs/features/<feature>/subtasks/. Use when asked to break down a feature, or when it spans several screens or layers or is too big for one reviewable diff; skip it when the task fits one implement plan.
 ---
 
-# Breakdown
+# Slice
 
 Goal: a sequence of subtasks where each one is small enough to review, complete enough to implement
 without guessing, and testable as a real flow in the running app.
@@ -17,7 +17,7 @@ Do not re-ask anything answered in the linked task.md / subtask / plan.
 
 Use when the task touches several screens or layers, or would produce more than one reviewable diff
 (~400 lines of production code or more than 3 modules). Otherwise tell the user to go straight to
-`implement-plan` with task.md, and stop.
+`blueprint` with task.md, and stop.
 
 ## Slicing rules
 
@@ -76,7 +76,7 @@ Use when the task touches several screens or layers, or would produce more than 
 6. **Write** one file per approved subtask: `docs/features/<feature>/subtasks/NN-<slug>.md`
    (NN = 01, 02, ...), matching the outline exactly. Ask the user to review the files.
 7. **Finish**: add a `## Subtasks` section with links at the end of task.md, then suggest running
-   `implement-plan` on subtask 01. Do not run it yourself.
+   `blueprint` on subtask 01. Do not run it yourself.
 
 ## Subtask file template
 
@@ -111,5 +111,5 @@ Status: Todo | Planned | In progress | Done
 
 Keep AC/EC IDs identical to task.md so plans, code reviews, and tests can trace back to the requirement.
 
-New subtasks start as `Todo`. `implement-plan` sets `Planned` when their plan is approved; `implement`
+New subtasks start as `Todo`. `blueprint` sets `Planned` when their plan is approved; `forge`
 sets `In progress` when it starts and `Done` when it finishes.

@@ -1,9 +1,9 @@
 ---
-name: implement
+name: forge
 description: Execute an approved implement plan in an Android project: write production code and unit tests step by step, compiling as it goes. Does not commit. Use when asked to implement a plan file.
 ---
 
-# Implement
+# Forge
 
 Goal: turn an approved plan into working code and unit tests, step by step, so that every step leaves the
 project compiling, the unit tests pass at the end, and the final diff matches the plan.
@@ -15,7 +15,7 @@ Do not re-ask anything answered in the linked task.md / subtask / plan.
 1. Read the plan (`docs/features/<feature>/implement-plan.md` or `implement-plans/NN-<slug>.md`) and the
    requirement it links to.
    - If `Status` is not `Approved`, ask the user to confirm the plan first.
-   - If no plan exists, suggest `implement-plan` and stop.
+   - If no plan exists, suggest `blueprint` and stop.
 2. Read `CLAUDE.md` and the `.claude/rules/*.md` matching the modules in the plan's Changes overview.
 3. Check `git status`. If there are unrelated uncommitted changes, tell the user before touching anything.
 4. Set the plan `Status: In progress` and, if the plan came from a subtask, the subtask's

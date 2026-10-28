@@ -1,9 +1,9 @@
 ---
-name: onboard-codebase
+name: scout
 description: Explore an Android codebase and generate or update a concise CLAUDE.md (setup, commands, modules, architecture, conventions, reusable components, do-nots). Use when starting on a new repo, or when asked to onboard, analyze the codebase, or create/refresh CLAUDE.md.
 ---
 
-# Onboard codebase
+# Scout
 
 Goal: a CLAUDE.md that lets Claude write code that fits this project on the first try — right module, right
 pattern, existing components reused, no boilerplate the project doesn't use. It is a map and a rulebook,
@@ -16,7 +16,7 @@ not a tutorial.
 - **Only what Claude can't cheaply infer.** Skip anything obvious from one file read (e.g. "Kotlin files end
   in .kt"). Keep what costs many reads to discover or is easy to get wrong.
 - **Concrete names.** Real class, module, plugin, and task names — not "use the base class".
-- **Short.** Target 100–150 lines. Per-layer detail belongs in `.claude/rules/` (see the `generate-rules` skill).
+- **Short.** Target 100–150 lines. Per-layer detail belongs in `.claude/rules/` (see the `rulebook` skill).
 - **Read-only** until the user approves the draft. No source edits, ever.
 
 ## Process
@@ -122,7 +122,7 @@ Writing rules:
   Claude would likely re-implement if not told — shared, used in 2+ places or living in a core/shared
   module, and not obvious from one file read (design system prefix, result/error wrapper, dispatcher or
   scope injection, shared UI pieces, test doubles). Prefer a naming pattern plus module (`Xyz*` in
-  `core:designsystem`) over listing every class. The `implement-plan` skill does the full per-task search.
+  `core:designsystem`) over listing every class. The `blueprint` skill does the full per-task search.
 
 ### 6. Review with the user
 
@@ -135,4 +135,4 @@ Writing rules:
 
 - Write `CLAUDE.md` at the repo root.
 - Report: line count, sections, commands verified vs unverified, open questions left.
-- Suggest next step: run `generate-rules` for per-layer rules. Do not run it yourself.
+- Suggest next step: run `rulebook` for per-layer rules. Do not run it yourself.

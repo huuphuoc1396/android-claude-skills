@@ -1,12 +1,12 @@
 ---
-name: brainstorming
-description: Clarify a feature idea or requirement through rounds of questions and write docs/features/<feature>/task.md, the source of truth for the requirement. Use at the start of a new feature, when a feature request is vague, or when asked to change an existing requirement.
+name: spark
+description: Clarify a feature idea or requirement through rounds of questions and write docs/features/<feature>/task.md, the source of truth for the requirement. Use to brainstorm or at the start of a new feature, when a feature request is vague, or when asked to change an existing requirement.
 ---
 
-# Brainstorming
+# Spark
 
-Goal: turn an idea into a `task.md` that a reviewer agrees with and that later steps (breakdown,
-implement-plan) can work from without asking again what the feature is supposed to do.
+Goal: turn an idea into a `task.md` that a reviewer agrees with and that later steps (slice,
+blueprint) can work from without asking again what the feature is supposed to do.
 
 `task.md` describes **what** and **why**, never **how**. No module, class, or library names unless the
 requirement itself demands them (e.g. "must work offline", "must use the existing login").
@@ -111,8 +111,8 @@ Show the user the path and ask them to review. Set `Status: Confirmed` only when
 ### 6. Finish
 
 Suggest the next step without running it:
-- Large task (several screens, several layers, or more than one reviewable diff): `breakdown`.
-- Small task: `implement-plan` directly on task.md.
+- Large task (several screens, several layers, or more than one reviewable diff): `slice`.
+- Small task: `blueprint` directly on task.md.
 
 ## Updating task.md
 

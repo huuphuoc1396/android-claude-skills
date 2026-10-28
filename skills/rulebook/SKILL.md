@@ -1,9 +1,9 @@
 ---
-name: generate-rules
+name: rulebook
 description: Generate path-scoped rule files in .claude/rules/ for an Android project, one per architectural layer. Use after onboarding (CLAUDE.md exists), or when asked to generate, refresh, or add rules for layers or modules.
 ---
 
-# Generate rules
+# Rulebook
 
 Goal: when Claude edits a file, the matching rule loads and tells it how that layer is written in *this*
 project — what it owns, what it may depend on, which file to copy, the steps to add something new, and the
@@ -43,7 +43,7 @@ Keep each rule 30–80 lines. Every claim must be backed by a file you read; eve
 
 ## Process
 
-1. **Prerequisites.** Read `CLAUDE.md` (if missing, suggest `onboard-codebase` first and stop) and any
+1. **Prerequisites.** Read `CLAUDE.md` (if missing, suggest `scout` first and stop) and any
    existing `.claude/rules/`. Existing rules are hypotheses to verify, not to discard.
 
 2. **Map modules to layers.** List modules from `settings.gradle(.kts)`; classify each by its build plugins,

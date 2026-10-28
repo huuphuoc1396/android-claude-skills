@@ -1,11 +1,11 @@
 ---
-name: implement-plan
+name: blueprint
 description: Write an implementation plan of ordered, buildable steps mapped to acceptance criteria for an Android requirement (task.md, subtask, chat, or ticket). Writes no production code. Use before implementing any non-trivial change.
 ---
 
-# Implement plan
+# Blueprint
 
-Goal: a plan concrete enough that the `implement` skill can execute it without new decisions, and that a
+Goal: a plan concrete enough that the `forge` skill can execute it without new decisions, and that a
 reviewer can check before any code exists. Every decision is made here; every question is answered here.
 
 This skill only writes docs: do not run build, test, lint, or format commands, even if CLAUDE.md lists
@@ -131,4 +131,4 @@ subtask, set its `Status: Planned` at the same time.
 
 ### 7. Finish
 
-Suggest running `implement` on the plan. Do not start coding.
+Suggest running `forge` on the plan. Do not start coding.
