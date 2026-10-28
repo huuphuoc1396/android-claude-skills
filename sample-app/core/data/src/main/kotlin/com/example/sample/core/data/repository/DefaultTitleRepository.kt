@@ -9,6 +9,7 @@ import com.example.sample.core.data.model.Title
 import com.example.sample.core.data.model.TitleDetails
 import com.example.sample.core.data.model.asExternalModel
 import com.example.sample.core.data.model.asTmdbMediaType
+import com.example.sample.core.data.model.toTmdbMediaType
 import com.example.sample.core.network.TmdbDiscoverQuery
 import com.example.sample.core.network.TmdbMediaType
 import com.example.sample.core.network.TmdbNetworkDataSource
@@ -38,6 +39,12 @@ internal class DefaultTitleRepository @Inject constructor(
         }
         val popular = async { fetch(rule, Section.Popular, minVoteCount = null) }
         CategoryTitles(featured = featured.await(), popular = popular.await())
+    }
+
+    override suspend fun search(query: String): List<Title> = withContext(ioDispatcher) {
+        network.search(query).mapNotNull { result ->
+            result.mediaType?.toTmdbMediaType()?.let { result.asExternalModel(it) }
+        }
     }
 
     override suspend fun getTitleDetails(id: Long, mediaType: MediaType): TitleDetails = withContext(ioDispatcher) {

@@ -307,6 +307,29 @@ class DefaultTitleRepositoryTest {
         assertEquals(null, repository.getTitleDetails(1, MediaType.Movie).trailerUrl)
     }
 
+    @Test
+    fun search_keepsOnlyMoviesAndTv() = testScope.runTest {
+        network.searchResults = listOf(
+            NetworkTitle(id = 1, title = "Matrix", mediaType = "movie"),
+            NetworkTitle(id = 2, name = "Keanu Reeves", mediaType = "person"),
+            NetworkTitle(id = 3, name = "Matrix Reloaded Show", mediaType = "tv"),
+        )
+
+        val results = repository.search("matrix")
+
+        assertEquals(
+            listOf(Title(1, MediaType.Movie, "Matrix", null), Title(3, MediaType.Tv, "Matrix Reloaded Show", null)),
+            results,
+        )
+    }
+
+    @Test
+    fun search_passesQuery() = testScope.runTest {
+        repository.search("lucifer")
+
+        assertEquals(listOf("lucifer"), network.searchQueries)
+    }
+
     private fun releaseDates(country: String, vararg dates: NetworkReleaseDate) =
         NetworkReleaseDates(listOf(NetworkCountryReleases(country, dates.toList())))
 

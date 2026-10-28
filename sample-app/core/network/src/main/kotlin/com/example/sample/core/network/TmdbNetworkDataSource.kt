@@ -10,6 +10,9 @@ interface TmdbNetworkDataSource {
 
     suspend fun discover(query: TmdbDiscoverQuery): List<NetworkTitle>
 
+    /** Movies, TV shows, and people matching [query]; each result carries its `media_type`. */
+    suspend fun search(query: String): List<NetworkTitle>
+
     /** A title with its credits and recommendations (and regional release dates for movies). */
     suspend fun getDetails(mediaType: TmdbMediaType, id: Long): NetworkTitleDetails
 }

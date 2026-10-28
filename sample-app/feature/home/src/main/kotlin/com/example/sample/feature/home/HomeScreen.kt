@@ -46,24 +46,29 @@ import com.example.sample.core.data.model.Title
 import com.example.sample.core.designsystem.component.SampleErrorState
 import com.example.sample.core.designsystem.component.SampleLoadingState
 import com.example.sample.core.designsystem.component.SamplePoster
-import com.example.sample.core.designsystem.theme.SampleColors
+import com.example.sample.core.designsystem.component.SampleSearchField
 import com.example.sample.core.designsystem.theme.SampleGradients
 import com.example.sample.core.designsystem.theme.SampleTheme
 
 private val SideMargin = 30.dp
 private val HeaderHeight = 522.dp
 
-// Unselected tabs and the search placeholder are white at reduced opacity (estimated from the screenshot).
+// Unselected tabs are white at reduced opacity (estimated from the screenshot).
 private const val DimmedAlpha = 0.6f
 
 @Composable
 internal fun HomeRoute(
     onTitleClick: (Title) -> Unit,
+    onSearch: (String) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val query by viewModel.query.collectAsStateWithLifecycle()
     HomeScreen(
         uiState = uiState,
+        query = query,
+        onQueryChange = viewModel::onQueryChange,
+        onSearch = { if (query.isNotBlank()) onSearch(query.trim()) },
         onCategorySelected = viewModel::selectCategory,
         onRetry = viewModel::retry,
         onTitleClick = onTitleClick,
@@ -73,6 +78,9 @@ internal fun HomeRoute(
 @Composable
 internal fun HomeScreen(
     uiState: HomeUiState,
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSearch: () -> Unit,
     onCategorySelected: (Category) -> Unit,
     onRetry: () -> Unit,
     onTitleClick: (Title) -> Unit,
@@ -93,7 +101,7 @@ internal fun HomeScreen(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 32.dp),
         ) {
-            item { Header() }
+            item { Header(query, onQueryChange, onSearch) }
             item {
                 CategoryTabs(
                     selected = uiState.selectedCategory,
@@ -107,7 +115,11 @@ internal fun HomeScreen(
 }
 
 @Composable
-private fun Header() {
+private fun Header(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSearch: () -> Unit,
+) {
     Column(
         modifier = Modifier
             .statusBarsPadding()
@@ -122,7 +134,13 @@ private fun Header() {
             )
             ProfileAvatar(Modifier.padding(start = 16.dp, top = 7.dp))
         }
-        HomeSearchField(Modifier.padding(top = 17.dp))
+        SampleSearchField(
+            query = query,
+            onQueryChange = onQueryChange,
+            onSearch = onSearch,
+            placeholder = stringResource(R.string.feature_home_search),
+            modifier = Modifier.padding(top = 17.dp),
+        )
     }
 }
 
@@ -138,32 +156,6 @@ private fun ProfileAvatar(modifier: Modifier = Modifier) {
             .border(BorderStroke(2.dp, Color.White), CircleShape)
             .clip(CircleShape),
     )
-}
-
-/** Drawn as in the design but not interactive until search is built. */
-@Composable
-private fun HomeSearchField(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(46.dp)
-            .clip(RoundedCornerShape(32.dp))
-            .background(SampleColors.SearchFill)
-            .padding(start = 21.dp, end = 17.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = stringResource(R.string.feature_home_search),
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.White.copy(alpha = DimmedAlpha),
-            modifier = Modifier.weight(1f),
-        )
-        Image(
-            painter = painterResource(R.drawable.ic_search),
-            contentDescription = null,
-            modifier = Modifier.size(20.dp),
-        )
-    }
 }
 
 @Composable
@@ -265,6 +257,9 @@ private fun HomeScreenPreview() {
     SampleTheme {
         HomeScreen(
             uiState = HomeUiState(Category.Films, HomeContent.Success(featured = titles, popular = titles)),
+            query = "",
+            onQueryChange = {},
+            onSearch = {},
             onCategorySelected = {},
             onRetry = {},
             onTitleClick = {},

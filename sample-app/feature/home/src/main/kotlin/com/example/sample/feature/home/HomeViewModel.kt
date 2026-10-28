@@ -1,5 +1,6 @@
 package com.example.sample.feature.home
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sample.core.data.model.Category
@@ -20,8 +21,12 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val titleRepository: TitleRepository,
 ) : ViewModel() {
+
+    /** The search text, kept while results are open and across process death. */
+    val query: StateFlow<String> = savedStateHandle.getStateFlow(QUERY_KEY, "")
 
     private val selectedCategory = MutableStateFlow(Category.Films)
     private val retryCount = MutableStateFlow(0)
@@ -40,6 +45,10 @@ class HomeViewModel @Inject constructor(
                 initialValue = HomeUiState(Category.Films, HomeContent.Loading),
             )
 
+    fun onQueryChange(query: String) {
+        savedStateHandle[QUERY_KEY] = query
+    }
+
     fun selectCategory(category: Category) {
         selectedCategory.value = category
     }
@@ -55,5 +64,9 @@ class HomeViewModel @Inject constructor(
         throw e
     } catch (e: Exception) {
         HomeContent.Error
+    }
+
+    private companion object {
+        const val QUERY_KEY = "query"
     }
 }

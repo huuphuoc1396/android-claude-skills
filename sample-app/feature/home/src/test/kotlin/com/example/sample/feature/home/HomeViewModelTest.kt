@@ -1,5 +1,6 @@
 package com.example.sample.feature.home
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.example.sample.core.data.model.Category
 import com.example.sample.core.data.model.CategoryTitles
@@ -20,7 +21,7 @@ class HomeViewModelTest {
 
     @Test
     fun initialState_isFilmsLoading() {
-        val viewModel = HomeViewModel(repository)
+        val viewModel = HomeViewModel(SavedStateHandle(), repository)
 
         assertEquals(HomeUiState(Category.Films, HomeContent.Loading), viewModel.uiState.value)
     }
@@ -28,7 +29,7 @@ class HomeViewModelTest {
     @Test
     fun load_success_showsFeaturedAndPopular() = runTest {
         repository.titles = mapOf(Category.Films to CategoryTitles(featured = listOf(film), popular = listOf(series)))
-        val viewModel = HomeViewModel(repository)
+        val viewModel = HomeViewModel(SavedStateHandle(), repository)
 
         viewModel.uiState.test {
             assertEquals(
@@ -41,7 +42,7 @@ class HomeViewModelTest {
     @Test
     fun selectCategory_loadsThatCategory() = runTest {
         repository.titles = mapOf(Category.Anime to CategoryTitles(featured = listOf(film), popular = emptyList()))
-        val viewModel = HomeViewModel(repository)
+        val viewModel = HomeViewModel(SavedStateHandle(), repository)
 
         viewModel.uiState.test {
             viewModel.selectCategory(Category.Anime)
@@ -57,7 +58,7 @@ class HomeViewModelTest {
     @Test
     fun load_failure_showsError() = runTest {
         repository.shouldFail = true
-        val viewModel = HomeViewModel(repository)
+        val viewModel = HomeViewModel(SavedStateHandle(), repository)
 
         viewModel.uiState.test {
             assertEquals(HomeUiState(Category.Films, HomeContent.Error), expectMostRecentItem())
@@ -67,7 +68,7 @@ class HomeViewModelTest {
     @Test
     fun retry_afterError_recovers() = runTest {
         repository.shouldFail = true
-        val viewModel = HomeViewModel(repository)
+        val viewModel = HomeViewModel(SavedStateHandle(), repository)
 
         viewModel.uiState.test {
             assertEquals(HomeContent.Error, expectMostRecentItem().content)
@@ -77,6 +78,22 @@ class HomeViewModelTest {
             assertEquals(HomeContent.Success(featured = emptyList(), popular = emptyList()), expectMostRecentItem().content)
             assertEquals(2, repository.requestedCategories.size)
         }
+    }
+
+    @Test
+    fun onQueryChange_updatesQuery() {
+        val viewModel = HomeViewModel(SavedStateHandle(), repository)
+
+        viewModel.onQueryChange("matrix")
+
+        assertEquals("matrix", viewModel.query.value)
+    }
+
+    @Test
+    fun query_restoredFromSavedState() {
+        val viewModel = HomeViewModel(SavedStateHandle(mapOf("query" to "lucifer")), repository)
+
+        assertEquals("lucifer", viewModel.query.value)
     }
 
     private val film = Title(id = 1, mediaType = MediaType.Movie, name = "Matrix", posterUrl = null)

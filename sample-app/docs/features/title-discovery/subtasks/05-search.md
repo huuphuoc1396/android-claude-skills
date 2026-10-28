@@ -3,7 +3,7 @@
 Feature: [task.md](../task.md)
 Depends on: 02-title-details
 Design: [search-results](../screens/search-results.md) (Loading, Results, No results, Offline, Error), [home](../screens/home.md) (search field)
-Status: Todo
+Status: Done
 
 ## Goal
 The user submits a query in the Home search field and sees matching titles from all categories; tapping

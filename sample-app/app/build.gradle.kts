@@ -32,6 +32,7 @@ dependencies {
     implementation(project(":feature:details"))
     implementation(project(":feature:home"))
     implementation(project(":feature:onboarding"))
+    implementation(project(":feature:search"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

@@ -64,7 +64,7 @@ private fun NetworkTitleDetails.regionalRelease(region: String): Pair<LocalDate?
 private fun String?.toLocalDate(): LocalDate? =
     this?.takeIf { it.length >= 10 }?.let { LocalDate.parse(it.take(10)) }
 
-private fun String.toTmdbMediaType(): TmdbMediaType? = TmdbMediaType.entries.firstOrNull { it.path == this }
+internal fun String.toTmdbMediaType(): TmdbMediaType? = TmdbMediaType.entries.firstOrNull { it.path == this }
 
 private fun TmdbMediaType.asExternalModel() = when (this) {
     TmdbMediaType.Movie -> MediaType.Movie

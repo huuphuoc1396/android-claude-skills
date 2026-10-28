@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_search_hint">Search</string>
+    <string name="feature_search_back">Back</string>
+    <string name="feature_search_no_results">No results for \"%1$s\"</string>
+    <string name="feature_search_offline">You\'re offline</string>
+    <string name="feature_search_error">Couldn\'t load</string>
+    <string name="feature_search_retry">Try again</string>
+</resources>

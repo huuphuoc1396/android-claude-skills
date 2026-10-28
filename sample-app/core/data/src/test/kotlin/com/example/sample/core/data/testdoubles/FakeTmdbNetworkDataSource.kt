@@ -20,6 +20,15 @@ class FakeTmdbNetworkDataSource : TmdbNetworkDataSource {
         return results[query.mediaType].orEmpty()
     }
 
+    var searchResults: List<NetworkTitle> = emptyList()
+    val searchQueries = mutableListOf<String>()
+
+    override suspend fun search(query: String): List<NetworkTitle> {
+        searchQueries += query
+        if (shouldFail) throw IOException("Network error")
+        return searchResults
+    }
+
     override suspend fun getDetails(mediaType: TmdbMediaType, id: Long): NetworkTitleDetails {
         if (shouldFail) throw IOException("Network error")
         return details.getValue(id)

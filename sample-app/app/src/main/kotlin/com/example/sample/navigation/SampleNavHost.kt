@@ -10,6 +10,8 @@ import com.example.sample.feature.home.navigation.HomeDestination
 import com.example.sample.feature.home.navigation.homeScreen
 import com.example.sample.feature.onboarding.navigation.OnboardingDestination
 import com.example.sample.feature.onboarding.navigation.onboardingScreen
+import com.example.sample.feature.search.navigation.navigateToSearch
+import com.example.sample.feature.search.navigation.searchScreen
 
 /** Every feature registers its screens here through its `NavGraphBuilder.<feature>Screen()` extension. */
 @Composable
@@ -31,7 +33,14 @@ fun SampleNavHost(
                 }
             },
         )
-        homeScreen(onTitleClick = navController::navigateToDetails)
+        homeScreen(
+            onTitleClick = navController::navigateToDetails,
+            onSearch = navController::navigateToSearch,
+        )
+        searchScreen(
+            onBack = navController::popBackStack,
+            onTitleClick = navController::navigateToDetails,
+        )
         detailsScreen(
             onBack = navController::popBackStack,
             onTitleClick = navController::navigateToDetails,

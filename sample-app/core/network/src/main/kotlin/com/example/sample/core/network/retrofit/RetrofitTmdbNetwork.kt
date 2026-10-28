@@ -23,6 +23,12 @@ interface TmdbApi {
         @Query("vote_count.gte") minVoteCount: Int?,
     ): NetworkPage
 
+    @GET("search/multi")
+    suspend fun search(
+        @Query("query") query: String,
+        @Query("include_adult") includeAdult: Boolean,
+    ): NetworkPage
+
     @GET("{media}/{id}")
     suspend fun getDetails(
         @Path("media") media: String,
@@ -44,6 +50,9 @@ internal class RetrofitTmdbNetwork @Inject constructor(
         originCountries = query.originCountries,
         minVoteCount = query.minVoteCount,
     ).results
+
+    override suspend fun search(query: String): List<NetworkTitle> =
+        api.search(query = query, includeAdult = false).results
 
     override suspend fun getDetails(mediaType: TmdbMediaType, id: Long): NetworkTitleDetails = api.getDetails(
         media = mediaType.path,
