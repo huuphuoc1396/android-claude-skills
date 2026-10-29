@@ -80,13 +80,19 @@ Classify what you find:
 Read only enough to name things that already exist: CLAUDE.md, the design system module, the theme
 (color / typography / spacing token names), and `res/drawable*` / icon sets. Use this to:
 - Mark assets that already exist (`exists`) or come from an icon library (`reuse`) instead of exporting.
-- Name tokens by their names in code when a clear match exists; otherwise by their Figma style name, or
-  as the nearest code token marked `(estimated)` when read from an image.
+- When a screen needs both states of an icon (filled and outline, on and off), always list both rows, even
+  if the design draws only one or the other seems unneeded: later steps read only this table.
+- Name tokens by the token name only (`textTertiary`, `bodyLarge`), never with a class, object, or package
+  prefix (`SampleColors.`, `MaterialTheme.typography.`); otherwise by their Figma style name, or as the
+  nearest token name marked `(estimated)` when read from an image. When the Figma file defines no color
+  or text styles, say so in the design's visual tokens and record the raw values read from the frames
+  (hex, gradient stops, sizes); don't map them to the project's theme names.
 
 ### 4. Cross-check
 
 List every mismatch between screens, flow, and task.md:
-- A screen no flow leads to.
+- A screen no flow leads to. A screen the user rules out of scope is still listed as an orphan if no flow
+  leads to it.
 - A flow destination with no screen design.
 - A state with no way out (error without retry, dead end without back).
 - A trigger in the flow with no matching control on the screen.
@@ -113,7 +119,8 @@ Use the templates below. Rules:
 - Set `Fidelity`: `wireframe` (no final copy, colors, or assets), `mockup`, or `final`.
 - **Variants**: fill the table for dark, landscape / tablet, and large font (add RTL if task.md needs it).
   `no` means not designed, not "not needed"; if task.md requires a variant the design lacks, list it in
-  Cross-check.
+  Cross-check. Write `yes` only for a variant the design actually draws (a frame or an explicit note);
+  never infer one from the theme or from the example below.
 
 Show the user the paths with a short summary (screens and states, asset counts by status, open questions)
 and ask them to review. Set `Status: Confirmed` only when they approve.
@@ -121,7 +128,9 @@ and ask them to review. Set `Status: Confirmed` only when they approve.
 ### 7. Finish
 
 - If the design revealed requirements task.md lacks (a confirm dialog, a back-stack rule, a new state),
-  list them and suggest updating task.md through `spark`. Do not edit task.md yourself.
+  list them and suggest updating task.md through `spark`. Do not edit task.md yourself. This includes a
+  requirement the design asks for that the user ruled out of scope in this round (a gesture, a sort): name
+  it and say it would need `spark` to come back in.
 - Suggest the next step without running it: `slice` for a large task, otherwise `blueprint`.
 
 ## design.md template
@@ -202,8 +211,8 @@ Covers: AC-1, AC-3, EC-2
 ## Variants
 | Variant | Designed | Differences |
 |---|---|---|
-| Dark | yes | img_empty_saved uses its dark variant |
-| Landscape / tablet | no | |
+| Dark | no | |
+| Landscape / tablet | yes | 5 columns instead of 3 |
 | Large font | no | |
 
 ## Notes
@@ -217,10 +226,12 @@ When the design changes (new link, new images, or `update` in the request):
 2. Find what changed. Figma gives no per-frame change date, so re-fetch only the structure (frame ids,
    names, sizes, text) for the link and compare it with the screen files by stable key; images are
    compared by name and by eye with the saved screenshots. Fetch details and screenshots only for the
-   frames that differ. If a Figma frame was renamed, ask whether to rename the file; if a new image
+   frames that differ; if the structure shows no difference, make no detail or screenshot call at all, and
+   report that nothing changed. If a Figma frame was renamed, ask whether to rename the file; if a new image
    matches no screen, ask whether it is a new screen or a renamed one.
 3. Show the changes as a short list (screens, states, navigation, assets: added / changed / removed) and
-   wait for approval.
+   wait for approval. Answers to the questions in step 2 (a rename, a new screen) do not replace this:
+   print the list afterwards, ask "Apply these changes?", and edit nothing before the yes.
 4. Apply them, add a Change log line, update `Captured`, and set `Status: Draft` until re-approved.
 5. If `subtasks/` or `implement-plans/` exist next to task.md, list the ones affected and suggest updating
    them (`slice` for subtasks, `blueprint` for plans). Do not edit them yourself.

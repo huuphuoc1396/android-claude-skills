@@ -33,9 +33,10 @@ tools by role; the names below are examples.
 - **Structure first**: a metadata / structure tool (e.g. `get_metadata`) on the link's node lists frames
   with ids, names, and sizes. Use it to find the screen frames before anything else.
 - **Details per screen frame only**: a design-context / code tool (e.g. `get_design_context`, `get_code`)
-  returns a lot of tokens. Call it on one screen frame at a time, never on a whole page or section, and
-  take only what the templates need: text, components, styles. Ignore the generated code.
-- **Screenshots**: a screenshot tool (e.g. `get_screenshot`) per frame; save each image into `screens/`.
+  returns a lot of tokens. Call it on one screen frame at a time (one id per call), never on a whole page
+  or section, and take only what the templates need: text, components, styles. Ignore the generated code.
+- **Screenshots**: a screenshot tool (e.g. `get_screenshot`), one frame per call; save each image into
+  `screens/`.
 - **Tokens**: a variables tool (e.g. `get_variable_defs`) gives the exact color / typography / spacing names.
 - **Assets**: when the tools return asset URLs or files, download them into `assets/`.
 - **Flow**: if no tool returns prototype interactions, get them from the REST API when `$FIGMA_TOKEN` is
@@ -46,6 +47,9 @@ tools by role; the names below are examples.
 - **Structure**: `GET /v1/files/<fileKey>/nodes?ids=<ids>&depth=<n>`. Save the raw response outside the
   repo (scratch or `$TMPDIR`), then filter it with `jq` or a short script down to name, type, size, text,
   style names, and interactions before reading it. Never read the raw JSON into context.
-- **Screenshots**: `GET /v1/images/<fileKey>?ids=<frame ids>&format=png&scale=2`, download into `screens/`.
+  Ask for details one screen frame at a time (`ids=` holds a single frame id); only the first structure
+  call may list several ids. Space the calls out and on a 429 wait before retrying instead of repeating them.
+- **Screenshots**: `GET /v1/images/<fileKey>?ids=<one frame id>&format=png&scale=2` per frame, then download
+  the returned URL into `screens/`.
 - **Assets**: the same endpoint with `format=svg` (vectors) or `png` (photos), download into `assets/`.
 - **Flow**: prototype interactions on nodes (`interactions`, or the legacy `transitionNodeID`).
