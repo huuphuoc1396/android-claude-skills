@@ -13,7 +13,7 @@ Answer questions: say Hilt + Room + Retrofit are the target stack, nothing is le
 ## Expect
 
 - [ ] Asks for approval before writing; nothing written before the yes.
-- [ ] `CLAUDE.md` at `sample-app/` root, about 100–150 lines.
+- [ ] `CLAUDE.md` at `sample-app/` root, between 80 and 150 lines.
 - [ ] Commands verified with `--dry-run` or `tasks`, including `./gradlew testDebugUnitTest`.
 - [ ] Setup names `TMDB_API_KEY` in the gitignored `local.properties`.
 - [ ] "Before finishing a code change" split into a default and a full tier.
@@ -25,10 +25,13 @@ Answer questions: say Hilt + Room + Retrofit are the target stack, nothing is le
       `@Dispatcher(SampleDispatchers.IO)`, `MainDispatcherRule`, the `Test*Repository` doubles and
       `TestNetworkMonitor` in `core:testing`.
 - [ ] "Do not" covers hand-editing `core/database/schemas/`, using `Dispatchers.IO` directly, and network
-      or database models leaving `core`.
+      or database models leaving `core` (a "Do not" bullet or an equivalent Architecture rule such as
+      "features only see `core:data` models" counts).
 - [ ] Reference features: `feature:details` (most complete) and `feature:onboarding` (simplest), or a
       reasoned alternative.
 
 ## Findings
 
--
+- 2026-10-28 (runner 20261028-172116): FAIL; fail: CLAUDE.md at sample-app/ root, about 100–150 lines; fail: "Do not" covers hand-editing schemas, Dispatchers.IO directly, and network/datab …
+- 2026-10-28 (runner 20261028-172950): PASS
+- 2026-10-28 (runner 20261028-190704): PASS

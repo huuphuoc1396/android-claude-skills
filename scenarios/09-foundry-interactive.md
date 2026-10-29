@@ -20,9 +20,12 @@ stop the session after subtask 01 instead.
       approval happen as in scenarios 03–05.
 - [ ] Waits for "continue" between subtasks.
 - [ ] After two subtasks, with more left, offers to continue in a fresh session.
-- [ ] In the new session, `/foundry` resumes at the first subtask by number that is not `Done` instead of
-      starting over.
+- [ ] In the new session, `/foundry` resumes at the first subtask by number that is neither `Done` nor
+      awaiting manual verification (`Manual verification: pending`) instead of starting over. Asking the
+      mode and commit questions again is fine.
 
 ## Findings
 
--
+- 2026-10-28 (runner 20261028-172950): PASS
+- 2026-10-29 (runner 20261029-080318): FAIL; fail: In the new session, /foundry resumes at the first subtask by number that is not  …
+- 2026-10-29 (runner 20261029-083100): PASS
