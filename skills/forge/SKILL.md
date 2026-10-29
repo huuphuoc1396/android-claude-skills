@@ -82,9 +82,19 @@ verified or re-recorded.
    cause in code (never delete or weaken a test to pass), and re-run only the failing modules. After 3
    failed attempts on the same failure, stop and report it with the output.
 3. If formatting changed files, re-run the touched modules' build and unit tests once.
-4. Walk the plan's Traceability table: confirm each AC/EC has code and a passing test (or a manual check).
-5. Only if every check in step 1 passed and step 4 found no gap: set the plan `Status: Done` and, if the
-   input was a subtask, its `Status: Done`. Otherwise leave both `In progress` and say why in the report.
+4. Walk the plan's Traceability table: confirm each AC/EC has code and a verification this run executed
+   and passed (a unit test, or a build / lint check the plan names for it). A manual "How to test" step
+   or a check that was skipped does not count as verified.
+5. Decide the status:
+   - Every check in step 1 passed and every AC/EC is verified: set the plan `Status: Done` and, if the
+     input was a subtask, its `Status: Done`.
+   - A check failed, or an AC/EC has no code or no verification at all: leave both `In progress` and list
+     each gap in the report.
+   - Everything automated passed and the only AC/EC left are covered by manual "How to test" steps: leave
+     both `In progress`, add the line `Manual verification: pending` under the plan's `Status`, and list
+     those AC/EC with their steps. Then ask once, after all steps: "Have you run these steps? Mark Done?".
+     On yes, set both `Done` and remove the line; on no, leave them as they are. When foundry's Auto mode
+     invoked you, do not ask: leave the status, the line, and the list in the report.
 6. Report to the user:
    - Steps done, files changed (grouped by module), deviations.
    - Commands run and their results, stated honestly (pass / fail with output).

@@ -31,6 +31,8 @@ Overrides that apply in both modes:
    - **Then the first unfinished artifact**: task.md not Confirmed → spark; design.md not Confirmed, or
      a design in the input and no design.md → mold; subtasks not written → slice; then the first
      subtask by `NN` that is not `Done`: an Approved or In progress plan → forge, otherwise → blueprint.
+     A plan with `Manual verification: pending` has all its code done: skip it, carry on with the next
+     subtask, and list it in the final report.
 3. Ask, in one round (skip any question the user's request already answers):
    - **Mode**
      - **Auto (recommended)** — follow the agent's recommended option at each decision and ask only
@@ -54,8 +56,10 @@ Overrides that apply in both modes:
    1. **blueprint** → the plan.
    2. **forge** → code and unit tests.
    3. If forge left the plan `In progress` (tests failing, a Traceability gap), stop: show its report and
-      do not commit or start the next subtask, in either mode. Otherwise commit if the user chose it, then
-      continue with the next subtask.
+      do not commit or start the next subtask, in either mode. If it is `In progress` only with
+      `Manual verification: pending`, the code is done: commit if the user chose it, then continue with the
+      next subtask (in Auto mode without asking; in Interactive mode forge has already asked). Otherwise
+      (`Done`) commit if the user chose it, then continue.
 
 Both modes stop at the same hard stops of `forge`: a large deviation from the plan, or the same
 compile error or test failure after 3 attempts.
@@ -105,6 +109,8 @@ answer it:
   with existing behavior that the input doesn't say to change.
 - A choice is hard to reverse or affects other features: database schema change or migration, new
   library, new module, change to a shared module's public API, removing or changing existing behavior.
+  Adding, changing, or removing any public member (method, property, parameter, type) of a class or
+  interface in a shared module counts, even when it only adds a method to an existing repository.
 - The design can't be read: a Figma link with no Figma MCP and no `$FIGMA_TOKEN`.
 - Anything the stage skills treat as a hard stop.
 
@@ -115,8 +121,13 @@ After the answer, carry on in auto mode.
 Report to the user:
 - Artifacts written: task.md, design.md, subtasks, plans (paths).
 - Per subtask: status, files changed by module, commit hash if committed.
-- **Auto decisions to review**: every `(auto)` decision across task.md, design.md, and plans, as a list
-  with links, so the user can review what was chosen for them in one place.
-- What was not verified: the `forge` report's list (UI, instrumented, screenshot tests, manual
-  "How to test" steps).
+- **Auto decisions to review**: a section with exactly this heading. List every `(auto)` decision across
+  task.md, design.md, and plans, one per line, keeping the `(auto)` tag and linking the file that holds
+  it, so the user can review what was chosen for them in one place.
+- **Awaiting manual verification**: a section with exactly this heading. List every plan with
+  `Manual verification: pending`, including plans skipped because an earlier run left them so, each with
+  its AC/EC and the "How to test" steps written out (a pointer to the file is not enough). Tell the user
+  to run them and mark each plan `Done` (or run `forge` on it again to be asked). Don't replace these two
+  sections with a general "to check on a device" note.
+- What was not verified: the `forge` report's list (UI, instrumented, screenshot tests).
 - If nothing was committed, ask whether to commit.
