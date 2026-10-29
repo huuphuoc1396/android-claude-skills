@@ -15,7 +15,7 @@ how to build it: no module, class, or Composable names. Mapping design names to 
 Never copy requirements into design.md; link to `AC-n` / `EC-n` instead.
 
 This skill only writes docs and fetches design files: do not run build, test, lint, or format commands, even
-if CLAUDE.md lists checks to run before finishing. Do not touch `res/` or any source set; `forge` moves
+if the context file (`CLAUDE.md`, or `.github/copilot-instructions.md` when the repo uses Copilot) lists checks to run before finishing. Do not touch `res/` or any source set; `forge` moves
 assets into the project.
 
 Do not re-ask anything answered in the linked task.md.
@@ -77,7 +77,7 @@ Classify what you find:
 
 ### 3. Match against the project
 
-Read only enough to name things that already exist: CLAUDE.md, the design system module, the theme
+Read only enough to name things that already exist: the context file, the design system module, the theme
 (color / typography / spacing token names), and `res/drawable*` / icon sets. Use this to:
 - Mark assets that already exist (`exists`) or come from an icon library (`reuse`) instead of exporting.
 - When a screen needs both states of an icon (filled and outline, on and off), always list both rows, even

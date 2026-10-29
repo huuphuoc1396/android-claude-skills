@@ -39,10 +39,10 @@ Overrides that apply in both modes:
        when needed (see "When auto mode still asks").
      - **Interactive** — ask the questions and approvals of spark, mold, slice, and
        blueprint as each skill describes.
-   - **Commit after each subtask?** — Yes, using the commit style in CLAUDE.md (recommended when the
+   - **Commit after each subtask?** — Yes, using the commit style in the context file (`CLAUDE.md`, or `.github/copilot-instructions.md` when the repo uses Copilot) (recommended when the
      feature is split into subtasks) / No, leave everything uncommitted for review.
 4. If the user chose to commit and the current branch is the default branch (`main`, `master`, `develop`,
-   or the remote's HEAD), create a feature branch first, named by CLAUDE.md's branch convention or
+   or the remote's HEAD), create a feature branch first, named by the context file's branch convention or
    `feature/<feature>`, and tell the user. Never commit to the default branch.
 
 ## 2. Run the stages

@@ -19,7 +19,7 @@ Do not re-ask anything answered in the linked task.md / subtask / plan.
    - **Resuming**: if `Status` is `In progress`, or any step is ticked (`✅`), continue the earlier run.
      Compile the modules of the ticked steps (main and unit test sources) to confirm they still build,
      then start at the first unticked step. If they don't build, report it before writing anything.
-2. Read `CLAUDE.md` and the `.claude/rules/*.md` matching the modules in the plan's Changes overview.
+2. Read the context file (`CLAUDE.md`, or `.github/copilot-instructions.md` when the repo uses Copilot) and the rule files matching the modules in the plan's Changes overview (`.claude/rules/*.md` by `paths`, or `.github/instructions/*.instructions.md` by `applyTo`).
    If the plan has a Design mapping, also read the screen files (`screens/<screen>.md`) it names, and
    open their screenshots only when the layout text isn't enough.
 3. Check `git status`. If there are unrelated uncommitted changes, tell the user before touching anything.
@@ -69,12 +69,12 @@ verified or re-recorded.
 
 - Only change files the plan lists (plus build files, DI, and resources they need). No drive-by refactors.
 - No speculative code: no unused parameters, abstractions, or TODO hooks "for later".
-- Follow every "Do not" in CLAUDE.md (generated files, baselines, design system, dependency direction).
+- Follow every "Do not" in the context file (generated files, baselines, design system, dependency direction).
 - New source files get the project's license header / formatting.
 
 ## Finish
 
-1. Run the **default tier** of CLAUDE.md's "Before finishing a code change" over every touched module,
+1. Run the **default tier** of the context file's "Before finishing a code change" (or its equivalent list of checks; if it has none, use the build's standard compile and unit-test tasks) over every touched module,
    plus the dependent modules of any shared module whose public API changed (build, unit tests,
    auto-format, baselines if dependencies changed). Run the full tier (format check,
    lint, screenshot, instrumented) only if the user asks for it.
@@ -100,5 +100,5 @@ verified or re-recorded.
    - Commands run and their results, stated honestly (pass / fail with output).
    - What was not verified: UI / instrumented / screenshot tests, manual "How to test" steps.
    - Placeholder assets still waiting for a real file, if any.
-   - Do not commit. Ask whether to commit once they have reviewed, using the commit style in CLAUDE.md
-     (or the style of recent `git log` if CLAUDE.md doesn't state one).
+   - Do not commit. Ask whether to commit once they have reviewed, using the commit style in the context file
+     (or the style of recent `git log` if it doesn't state one).

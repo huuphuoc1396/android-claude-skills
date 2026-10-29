@@ -8,7 +8,7 @@ description: Split a large task.md into ordered, reviewable vertical-slice subta
 Goal: a sequence of subtasks where each one is small enough to review, complete enough to implement
 without guessing, and testable as a real flow in the running app.
 
-This skill only writes docs: do not run build, test, lint, or format commands, even if CLAUDE.md lists
+This skill only writes docs: do not run build, test, lint, or format commands, even if the context file (`CLAUDE.md`, or `.github/copilot-instructions.md` when the repo uses Copilot) lists
 checks to run before finishing.
 
 Do not re-ask anything answered in the linked task.md / subtask / plan.
@@ -41,7 +41,7 @@ Use when the task touches several screens or layers, or would produce more than 
 
 If `docs/features/<feature>/subtasks/` already has files, go to **Updating** below.
 
-1. **Read** task.md (status should be Confirmed; if Draft, warn the user), CLAUDE.md, and skim the
+1. **Read** task.md (status should be Confirmed; if Draft, warn the user), the context file, and skim the
    areas the feature touches — only to judge size and layers, not to design. If `design.md` exists, read
    it (not the screen files): its screens, states, and Navigation help size the slices. Slices still
    follow user flows, not one subtask per screen.

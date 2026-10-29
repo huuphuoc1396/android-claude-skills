@@ -11,7 +11,7 @@ blueprint) can work from without asking again what the feature is supposed to do
 `task.md` describes **what** and **why**, never **how**. No module, class, or library names unless the
 requirement itself demands them (e.g. "must work offline", "must use the existing login").
 
-This skill only writes docs: do not run build, test, lint, or format commands, even if CLAUDE.md lists
+This skill only writes docs: do not run build, test, lint, or format commands, even if the context file (`CLAUDE.md`, or `.github/copilot-instructions.md` when the repo uses Copilot) lists
 checks to run before finishing.
 
 ## Process
@@ -32,7 +32,7 @@ When the request names an existing feature's slug (`/spark <slug>: …`), it is 
 
 ### 2. Light context read
 
-Read only enough of the project to ask good questions: CLAUDE.md, the screens or features the idea touches,
+Read only enough of the project to ask good questions: the context file, the screens or features the idea touches,
 and related existing behavior. The point is to spot conflicts and reuse ("there is already a bookmark
 feature — should this extend it?"), not to design the solution.
 

@@ -84,8 +84,9 @@ Then invoke one in Copilot chat, e.g. `/spark`, or just describe the task and Co
 
 Things to know:
 
-- The skills read and write `CLAUDE.md` and `.claude/rules/`. Copilot in VS Code also reads `CLAUDE.md`
-  and `.claude/rules/` as instructions, so the output works there as is. If your Copilot setup only reads
-  `.github/copilot-instructions.md` or `AGENTS.md`, point that file at `CLAUDE.md`.
+- Already have `.github/copilot-instructions.md` and `.github/instructions/<layer>.instructions.md`? Skip
+  `scout` and `rulebook`. `spark`, `mold`, `slice`, `blueprint`, `forge`, and `foundry` use those files
+  (rules matched by `applyTo`) wherever they would read `CLAUDE.md` and `.claude/rules/`. `scout` and
+  `rulebook` themselves still write the Claude format.
 - Where a skill says "subagent", Copilot uses its own sub-agent or runs the work inline; the result is the same.
 - The scenario runner in `scenarios/` drives Claude Code only; the Copilot setup is not covered by it.

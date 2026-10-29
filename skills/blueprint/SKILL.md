@@ -8,7 +8,7 @@ description: Write an implementation plan of ordered, buildable steps mapped to 
 Goal: a plan concrete enough that the `forge` skill can execute it without new decisions, and that a
 reviewer can check before any code exists. Every decision is made here; every question is answered here.
 
-This skill only writes docs: do not run build, test, lint, or format commands, even if CLAUDE.md lists
+This skill only writes docs: do not run build, test, lint, or format commands, even if the context file (`CLAUDE.md`, or `.github/copilot-instructions.md` when the repo uses Copilot) lists
 checks to run before finishing. Read-only searches (grep, find, git log) are fine.
 
 Do not re-ask anything answered in the linked task.md / subtask / plan.
@@ -28,7 +28,7 @@ Do not re-ask anything answered in the linked task.md / subtask / plan.
 
 ### 2. Load the project rules
 
-Read `CLAUDE.md` and every `.claude/rules/*.md` whose paths match the modules you expect to touch. These
+Read the context file (`CLAUDE.md`, or `.github/copilot-instructions.md` when the repo uses Copilot) and every rule file whose globs match the modules you expect to touch (`.claude/rules/*.md` by `paths`, or `.github/instructions/*.instructions.md` by `applyTo`). These
 override your defaults. When they conflict with what you see in code, follow the rules and mention the conflict.
 
 ### 3. Explore the codebase
@@ -36,7 +36,7 @@ override your defaults. When they conflict with what you see in code, follow the
 Find, with file paths as evidence:
 - **Where it goes**: the modules and packages to touch or create, and their allowed dependencies.
 - **Closest existing example**: a feature or class that already does something similar — the plan copies its shape.
-- **Components to reuse**: start from CLAUDE.md's "Reuse before you create" table, then sweep the
+- **Components to reuse**: start from the context file's "Reuse before you create" table (or whatever reuse list it has), then sweep the
   categories below that the requirement touches. Search before planning anything new; a new component
   needs a reason why no existing one fits.
 - **Patterns to follow**: state holder and UI state shape, error/result handling, threading, model mapping,
@@ -78,7 +78,7 @@ Ask in rounds of 2–4 multiple-choice questions, recommended option first with 
   schema change and migration, library addition.
 - **Requirement gaps** found while exploring: behavior the requirement didn't specify but the code forces a
   choice on (e.g. what to show when the cached copy is stale).
-Don't ask what CLAUDE.md, rules, or existing code already answer. Continue until nothing is open.
+Don't ask what the context file, rules, or existing code already answer. Continue until nothing is open.
 
 ### 5. Write the plan
 
@@ -137,7 +137,7 @@ Rules for steps:
 - Signatures and data shapes, not full implementations. Pseudo-code only for non-obvious logic.
 - Every AC and EC appears in Traceability with at least one step and one test (or a manual check, stated).
 - Only the files the requirement needs. No speculative abstractions, base classes, or "for later" hooks.
-- Commands are the real ones from CLAUDE.md.
+- Commands are the real ones from the context file.
 - Assets are added in the step that first uses them: `provided` ones converted from `assets/` into the
   destination, `exists` and `reuse` ones referenced. `needs-export` ones get a placeholder, and the plan
   lists them under Risks.
@@ -147,7 +147,7 @@ Rules for steps:
 ### 6. Review
 
 Self-check before showing it: every reused component exists at the stated path; the dependency direction
-follows CLAUDE.md; nothing in the plan duplicates an existing component. Then ask the user to review the
+follows the context file; nothing in the plan duplicates an existing component. Then ask the user to review the
 file. Apply changes they ask for. Set `Status: Approved` only after an explicit yes; if the input was a
 subtask, set its `Status: Planned` at the same time.
 
