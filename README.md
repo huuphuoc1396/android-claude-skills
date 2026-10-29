@@ -1,6 +1,6 @@
 # Android Claude Skills
 
-[Claude Code](https://claude.com/claude-code) skills for taking a feature in an Android project from idea to implemented code.
+[Claude Code](https://claude.com/claude-code) and [GitHub Copilot](https://docs.github.com/copilot/concepts/agents/about-agent-skills) skills for taking a feature in an Android project from idea to implemented code.
 
 ## Skills
 
@@ -34,6 +34,7 @@ called again with changed input.
 skills/        # the skills; the only place to edit them
 sample-app/    # small multi-module Android app for testing the skills
   .claude/skills -> ../../skills   (symlink, so the app always sees the current skills)
+  .github/skills -> ../../skills   (same, for GitHub Copilot)
 scenarios/     # step-by-step checks for each skill, run against sample-app
 ```
 
@@ -67,3 +68,24 @@ cp -r android-claude-skills/skills/* <your-project>/.claude/skills/   # one proj
 ```
 
 Then invoke a skill in Claude Code, e.g. `/spark`.
+
+## Use with GitHub Copilot
+
+The skills are standard [Agent Skills](https://agentskills.io) (`SKILL.md` with `name` and `description`
+frontmatter), which Copilot loads from `.github/skills/` in agent mode (VS Code, Copilot CLI, and the cloud
+agent). No conversion is needed:
+
+```bash
+cp -r android-claude-skills/skills/* <your-project>/.github/skills/   # one project
+cp -r android-claude-skills/skills/* ~/.copilot/skills/               # all projects
+```
+
+Then invoke one in Copilot chat, e.g. `/spark`, or just describe the task and Copilot picks the skill.
+
+Things to know:
+
+- The skills read and write `CLAUDE.md` and `.claude/rules/`. Copilot in VS Code also reads `CLAUDE.md`
+  and `.claude/rules/` as instructions, so the output works there as is. If your Copilot setup only reads
+  `.github/copilot-instructions.md` or `AGENTS.md`, point that file at `CLAUDE.md`.
+- Where a skill says "subagent", Copilot uses its own sub-agent or runs the work inline; the result is the same.
+- The scenario runner in `scenarios/` drives Claude Code only; the Copilot setup is not covered by it.
