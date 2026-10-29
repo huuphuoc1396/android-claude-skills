@@ -57,6 +57,8 @@ STOP_ON_SKILL_MAX_TURNS = 6
 # Commands no session may run. curl is allowed only to the Figma API, in sessions the tester opens with figma.
 BLOCKED = re.compile(r"\bgit\s+(push|remote)\b|\bsudo\b|\bwget\b|\bssh\b|\bscp\b")
 CURL = re.compile(r"\bcurl\b")
+# The Figma API, and the S3 host its image endpoints return download URLs on.
+FIGMA_HOSTS = re.compile(r"api\.figma\.com|figma-alpha-api\.s3[\w.-]*\.amazonaws\.com")
 WRITE_TOOLS = {"Edit", "Write", "MultiEdit", "NotebookEdit"}
 NO_NETWORK_TOOLS = {"WebFetch", "WebSearch"}
 
@@ -185,7 +187,8 @@ def git_state(start_ref):
         "$ git status --short -- sample-app",
         sh(["git", "status", "--short", "--", "sample-app"]) or "(clean)",
         f"$ git diff --stat {start_ref} -- sample-app   (tracked files changed since the scenario's start)",
-        sh(["git", "diff", "--stat", start_ref, "--", "sample-app"], check=False) or "(none)",
+        sh(["git", "diff", "--stat", start_ref, "--", "sample-app", ":(exclude)sample-app/.claude/settings.json"],
+           check=False) or "(none)",
     ])
 
 
@@ -211,7 +214,7 @@ def guard(allow_figma=False):
             command = data.get("command", "")
             if BLOCKED.search(command):
                 return "This command is not allowed in scenario runs."
-            if CURL.search(command) and not (allow_figma and "api.figma.com" in command):
+            if CURL.search(command) and not (allow_figma and FIGMA_HOSTS.search(command)):
                 return "Network commands are not allowed in scenario runs."
         return None
 
@@ -477,11 +480,15 @@ file, in order, with a verdict and short evidence (a file path and what is in it
 async def judge(scenario, log_path, state, model):
     from claude_agent_sdk import query
 
-    prompt = (f"Scenario file {scenario.path.name}:\n\n{scenario.text}\n\n"
+    reference = RUNS / "reference-18"
+    note = (f"Reference copies named in the scenario as `scenarios/.runs/reference-18/...` are at "
+            f"{reference}/...\n\n" if scenario.id == "18" else "")
+    prompt = (f"Scenario file {scenario.path.name}:\n\n{scenario.text}\n\n{note}"
               f"Run log: {log_path}\n\nGit state of the sandbox after the run:\n{state}\n")
     options = ClaudeAgentOptions(
         cwd=str(SANDBOX), model=model, setting_sources=[], skills=[], tools=["Read", "Glob", "Grep"],
-        allowed_tools=["Read", "Glob", "Grep"], add_dirs=[str(log_path.parent)],
+        allowed_tools=["Read", "Glob", "Grep"],
+        add_dirs=[str(log_path.parent)] + ([str(reference)] if scenario.id == "18" else []),
         system_prompt=JUDGE_PROMPT.format(sample_app=SANDBOX / "sample-app"),
         output_format={"type": "json_schema", "schema": JUDGE_SCHEMA},
     )
@@ -502,6 +509,14 @@ async def run_scenario(scenario, out, args):
     log = Log(out / "log.md")
     log.write(f"# {scenario.title}")
     snapshot("restore", scenario.setup)
+    if scenario.id == "18":
+        # The judge compares against the baseline design, which must not live in the sandbox the subject edits.
+        reference = RUNS / "reference-18"
+        shutil.rmtree(reference, ignore_errors=True)
+        reference.mkdir(parents=True)
+        archive = subprocess.run(["git", "archive", "sample-baseline", "sample-app/docs/features/title-discovery"],
+                                 cwd=REPO, capture_output=True, check=True).stdout
+        subprocess.run(["tar", "-x", "-C", str(reference)], input=archive, check=True)
     start_ref = "sample-baseline" if scenario.setup == "baseline" else f"snap/{scenario.setup}"
     figma = bool(os.environ.get("FIGMA_TOKEN")) and not args.no_figma
     tester = Tester(scenario, log, args.tester_model, figma)

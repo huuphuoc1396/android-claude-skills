@@ -36,7 +36,9 @@ case "${1:-}" in
     git rev-parse -q --verify "refs/tags/$source" >/dev/null || { echo "No snapshot $source" >&2; exit 1; }
     # Clean first: files the snapshot adds are untracked, so cleaning afterwards would delete them.
     git clean -fdq -- sample-app
-    git restore --source="$source" --worktree -- sample-app
+    # sample-app/.claude/settings.json is the usage hook's symlink, part of the harness and not of the
+    # scenario. Snapshots saved before it was tracked lack it, so leave it as HEAD has it.
+    git restore --source="$source" --worktree -- sample-app ':(exclude)sample-app/.claude/settings.json'
     echo "Restored sample-app/ from $source"
     ;;
   list)
