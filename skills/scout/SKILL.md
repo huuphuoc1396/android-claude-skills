@@ -26,7 +26,9 @@ not a tutorial.
 - Read any existing `CLAUDE.md`, `AGENTS.md`, `README*`, `docs/`, `CONTRIBUTING*`, `.github/` (workflows,
   PR templates), `.claude/rules/`.
 - If CLAUDE.md exists: treat it as a hypothesis. You will verify each claim and propose a diff (step 6),
-  not rewrite blindly.
+  not rewrite blindly. Verify its Setup section against the build files too: every `local.properties`
+  key or secret the build reads (`BuildConfig` fields, `localProperties`, `System.getenv`) must be named
+  there. One that is missing from Setup goes under **Missing**, even if another section mentions it.
 
 ### 2. Explore (read-only)
 
@@ -128,7 +130,8 @@ Writing rules:
 
 - New file: show the full draft.
 - Existing file: show a diff-style summary grouped as **Wrong (fix)**, **Missing (add)**, **Stale (remove)**,
-  each with its evidence (file path), then the full proposed file.
+  each with its evidence (file path), then the full proposed file: every line of it, with no `…` or
+  "unchanged" placeholder standing in for a section.
 - Ask for approval or changes. Iterate until approved. Write the file only after an explicit yes.
 
 ### 7. Finish

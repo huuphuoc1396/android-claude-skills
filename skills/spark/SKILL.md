@@ -27,6 +27,8 @@ Accept any mix of:
 
 List `docs/features/`. If a folder looks like the same or an overlapping feature (by slug or by its task.md
 Goal), ask whether this is an update to it or a new feature. For an update, go to **Updating task.md** below.
+When the request names an existing feature's slug (`/spark <slug>: …`), it is an update: go straight to
+**Updating task.md** without asking.
 
 ### 2. Light context read
 
@@ -125,7 +127,13 @@ Suggest the next step without running it:
 
 When the user asks to change the requirement (in chat or with new material):
 1. Read the current task.md.
-2. Ask questions only about what the change leaves unclear, in the same round style.
+2. Ask questions only about what the change leaves unclear, in the same round style: how it touches
+   behavior the task.md already defines (does removing a title here also clear it elsewhere?), 2–4
+   questions in total. Before asking, reread the request: whatever it states (a gesture, the outcome of
+   an action, an Undo) is settled, so do not ask it again. Do not ask how to split the work into
+   subtasks or plans; `slice` and `blueprint` do that (step 5). Settle the remaining details (Undo timing,
+   accessibility, rotation, process death) with a default and record it as `(assumed)` in the new
+   criteria instead of asking.
 3. Show the proposed changes as a short list (added / changed / removed, with IDs) and wait for approval.
 4. Apply them, keep IDs stable, add a Change log line, and set `Status: Draft` until re-approved.
 5. If `design.md`, `subtasks/`, or `implement-plans/` exist next to task.md, list the ones affected by the
