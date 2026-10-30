@@ -17,6 +17,8 @@
 
 ## Workflow
 
+![How the skills work together](docs/workflow.svg)
+
 ```
 scout → rulebook                                (once per repo)
 spark → [mold] → [slice] → blueprint → forge    (per feature)
